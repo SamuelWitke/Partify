@@ -2,6 +2,8 @@
 
 ### Install
 ```
+This project requires redis so if you don't have it 
+sudo apt install redis-server
 yarn install
 ```
 
