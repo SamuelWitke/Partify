@@ -1,0 +1,29 @@
+@import 'base';
+
+.container {
+  height: 100%;
+  overflow-y: hidden;
+}
+.children{
+  height: calc(100% - 48px);
+  background-color: $background;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+}
+@media (min-width: 768px) {
+  .children{
+    width: 750px;
+  }
+}
+@media (min-width: 992px) {
+  .children{
+    width: 970px;
+  }
+}
+@media (min-width: 1200px) {
+  .children{
+    width: 1170px;
+  }
+}
