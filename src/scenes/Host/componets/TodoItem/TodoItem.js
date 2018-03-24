@@ -8,6 +8,9 @@ import { isObject } from 'lodash'
 import {GridList, GridTile} from 'material-ui/GridList';
 import IconButton from 'material-ui/IconButton';
 import StarBorder from 'material-ui/svg-icons/toggle/star-border';
+import ActionFavorite from 'material-ui/svg-icons/action/favorite';
+import ActionFavoriteBorder from 'material-ui/svg-icons/action/favorite-border';
+
 
 
 
@@ -22,6 +25,8 @@ const TodoItem = ({ disabled,song,key, id, onCompleteClick, onDeleteClick }) => 
         }}
         actionIcon={
             <Checkbox 
+             checkedIcon={<ActionFavorite />}
+             uncheckedIcon={<ActionFavoriteBorder />}
             disabled={disabled}
             checked={disabled}
             onCheck={() => onCompleteClick(song, song._key || id)}/>}

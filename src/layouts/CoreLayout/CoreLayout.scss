@@ -1,4 +1,3 @@
-@import 'base';
 
 .container {
   height: 100%;
@@ -6,9 +5,8 @@
 }
 .children{
   height: calc(100% - 48px);
-  background-color: $background;
   padding-right: 15px;
-  padding-left: 15px;
+  padding-left: 16px;
   margin-right: auto;
   margin-left: auto;
 }

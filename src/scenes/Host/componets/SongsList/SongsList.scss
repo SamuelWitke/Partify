@@ -1,9 +1,23 @@
 @import 'base';
+.list {
+    max-height: 100%;
+    overflow: auto
+}
+.list::-webkit-scrollbar {
+    width: 1em;
+  background-color: darkgrey;
+}
+ 
 
+.root {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
 .container {
   min-width: 300px;
   margin-bottom: 2rem;
-       margin: 0 auto;
+  margin: 0 auto;
   padding-right: 15px;
   padding-left: 15px;
   margin-right: auto;

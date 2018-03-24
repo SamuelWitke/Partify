@@ -53,8 +53,9 @@ export default class SongsList extends Component {
         console.log(typeof song.song.project.votedBy == 'object' ? Object.keys(song.song.project.votedBy).map( key => key).includes(uid):false,uid)})
  
         return(
-            <Paper style={{maxHeight: '100%', overflow: 'auto'}}>
+            <Paper>
                 {!isEmpty(songs) ? (
+            <div className={classes.list}>
                     <div style={styles.root}>
                         <Subheader>Songs</Subheader>
                         <GridList
@@ -76,6 +77,7 @@ export default class SongsList extends Component {
                             ))}
                         </GridList >
                     </div>
+        </div>
                 ) : (
                     <div className={classes.empty}>No songs</div>
                 )}

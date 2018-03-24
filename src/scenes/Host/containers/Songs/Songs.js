@@ -184,21 +184,20 @@ class Songs extends Component {
                         height: '100%'
                     }}
                 />
-                <div className={classes.info}>
-                </div>
-                <div className={classes.todos}>
-
-                </div>
+                <br/>
                 <Grid
                     tilesData = {this.state.items}
                     handleTouchTap = { this.onTouchTap }
                 />
+                { this.state.items.length > 0 &&
                 <FloatingActionButton 
                     style={fixedbutton}
                     secondary={true}
                     onClick={this.submitSongs} >
                     <ContentAdd />
                 </FloatingActionButton>
+
+                }
             </div>
         )
     }

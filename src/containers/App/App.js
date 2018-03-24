@@ -14,36 +14,35 @@ import Notifications from 'react-notification-system-redux';
 
 
 class AppContainer extends Component {
-  static childContextTypes = {
-    muiTheme: PropTypes.object
-  }
+    static childContextTypes = {
+        muiTheme: PropTypes.object
+    }
 
-  static propTypes = {
-    routes: PropTypes.object.isRequired,
-    store: PropTypes.object.isRequired
-  }
+    static propTypes = {
+        routes: PropTypes.object.isRequired,
+        store: PropTypes.object.isRequired
+    }
 
-  getChildContext = () => ({
-    muiTheme: getMuiTheme(Theme)
-  })
+    getChildContext = () => ({
+        muiTheme: getMuiTheme(Theme)
+    })
 
-  render() {
-    const { routes, store } = this.props
-    const {notifications} = this.props;
-    return (
-      <Provider store={store}>
-        <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-        <div>
-          <Notifications notifications={notifications} />
-          <Router history={hashHistory}>{routes}</Router>
-        </div>
-          </MuiThemeProvider>
-
-      </Provider>
-    )
-  }
+    render() {
+        const { routes, store } = this.props
+        const {notifications} = this.props;
+        return (
+            <Provider store={store}>
+                <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+                    <div>
+                        <Notifications notifications={notifications} />
+                        <Router history={hashHistory}>{routes}</Router>
+                    </div>
+                </MuiThemeProvider>
+            </Provider>
+        )
+    }
 }
 
 export default connect(
-  state => ({ notifications: state.notifications })
+    state => ({ notifications: state.notifications })
 )(AppContainer);

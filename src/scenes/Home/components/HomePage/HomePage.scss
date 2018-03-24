@@ -4,9 +4,7 @@
   padding-top: 4rem;
 }
 .info {
-  @extend .flex-column-center;
+    color: #ecb985 !important;
 }
 .note {
-  margin-top: 2rem;
-  margin-bottom: 2rem;
 }

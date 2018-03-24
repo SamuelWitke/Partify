@@ -6,7 +6,7 @@ import IconButton from 'material-ui/IconButton'
 import DeleteIcon from 'material-ui/svg-icons/action/delete'
 import classes from './ProjectTile.scss'
 
-export const ProjectTile = ({ project, onSelect, onDelete, showDelete }) => (
+const ProjectTile = ({ project, onSelect, onDelete, showDelete }) => (
   <Paper className={classes.container}>
     <div className={classes.top}>
       <span className={classes.name} onClick={() => onSelect(project)}>

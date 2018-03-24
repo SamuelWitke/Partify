@@ -5,6 +5,7 @@ import { compose, withHandlers } from 'recompose'
 import { withNotifications } from 'modules/notification'
 import classes from './HomePage.scss'
 import Connect from '../Connect/Connect.js'
+import Party from '../../../../static/20151017_000009.jpg'
 import {push} from 'react-router-redux'
 import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card';
 import { firebaseConnect, populate } from 'react-redux-firebase'
@@ -43,15 +44,15 @@ const enhance = compose(
 const Home = ({ addNew, onSubmitFail }) => (
     <Card>
         <CardMedia overlay={<CardTitle title="Connect or Host" subtitle="A local Spotify Party" />} >
-            <img src="https://lh3.googleusercontent.com/hrcxOzTTFGAn1veLWGS3Jd2EsVeBDkCGfQcquB_7zS5j0v0XmdJxkU4EloPEl8DinkFv2mpbHoOqBO9pzX6w8F8N0_KWsbJhZzHhVEpROBCpv4tFRllyQsTcOfTAU8SR4kt1lsmepPasWREBDfGhyw4ydGrw7_z14kjzvxpGaefC9G0Evp1zPZVPqlcj6NcdbyBsvzL4y_nRc4gQ-nf-jzzD4Cih_Z8AdZ0GQswHFdXgfMCp2IU6Eq6VO6kSLiS1TL7yavikvNl95TM9BoMuK1CYFpgPM2ntNWeXOVbE0Xwx8E21oEnNNsldWrX-5DR65zKqJI2pyIMc7c_XuEfEQPywGFxE5tYCz_xrETUpCz5QJGHVXzgNWCOdkxhQC1_94SwP5NG1oso0xulsqTAJrYmi8cUD-K4QHuhC0jjHkX1kbN60tK9xBZbtiVHJ93yWW5u8H3sV85qcbn5-soUNiRNTMVyq3PJOdHuuuOlyhpx5e-WMQFRBOiqUNgXAgfk99fgGXc6-LkBkVsFcFY_YUNMUW3VU-H7m1uVwIU6mDYckhIG64kxv-00VnOsXTzGs-b2IbRs2J9PuxiZ5Wxz2mxXMSmYrmlRmIpqLJIg=w1691-h951-no" alt="" />
+            <img src={Party}/>
         </CardMedia>
         <Connect
             disabled={false}
             onSubmit={addNew}
             onSubmitFail={onSubmitFail}
         />
-        <CardText>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        <CardText className={classes.info}>
+            They wanna hear it! Partify lets your guests control the music at home or wherever you are.
         </CardText>
     </Card>
 )

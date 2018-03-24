@@ -96,7 +96,7 @@ router.post('/devices', (req,res) => {
         };
         request.get(options, function(error, response, body) {
             console.log(error,body)
-            if(body.error == null){
+            if(body.error == null && body.devices.length > 0){
                 body.devices.forEach( (device) => {
                     devices.push({
                         name: device.name,
@@ -104,12 +104,8 @@ router.post('/devices', (req,res) => {
                         id: device.id,
                     });
                 });
-                if(devices.length>0){
-                    console.log(devices)
-                    res.json({devices});
-                }          
-            }
-            else if(body.error.message == 'The access token expired'){
+                res.json({devices});
+            }else if(body.error != undefined  && body.error.message == 'The access token expired'){
                 authOptions = {
                     url: 'https://accounts.spotify.com/api/token',
                     headers: { 'Authorization': 'Basic ' + (new Buffer(process.env.SPOTIFYCLIENT+ ':' + process.env.SPOTIFYSECRET).toString('base64')) },
@@ -127,8 +123,7 @@ router.post('/devices', (req,res) => {
                         res.sendStatus(204)
                     }
                 });
-            }
-            else 
+            }else 
                 res.json( {msg : "no devices"});
         });
     }else

@@ -47,35 +47,64 @@ export default class Projects extends Component {
         auth: PropTypes.object
     }
 
-    async componentWillMount(){
-        const { firebase, auth, projects, dispatch, spotifyReducer} = this.props
-        let user = firebase.auth().onAuthStateChanged( async(user)=>{
-            const accessRef = this.props.firebase.database().ref(`users/${user.uid}/accessToken`);
-            const refreshToken = this.props.firebase.database().ref(`users/${user.uid}/refreshToken`);
-            const snapshotAccess = await accessRef.once('value');
-            const snapshotRefresh = await refreshToken.once('value');
-            const body = {
-                name: user.uid,
-                access_token: snapshotAccess.val(), 
-                refresh_token: snapshotRefresh.val(), 
-            }
-            const response = await fetch('/devices',{
-                headers: {
-                    'Accept': 'application/json, text/plain, ',
-                    'Content-Type': 'application/json'
-                },
-                method: "POST",
-                body: JSON.stringify(body)  
+    componentWillUpdate(oldProps,oldState){
+        if(oldState.devices.length > 0 && this.state.devices.length > 0){
+            console.log('here')
+            let val = false;
+            oldState.devices.forEach( (item,i) =>{
+                if(item.id !== this.state.devices[i].id)
+                    val = true;
             })
-            const data = await response.json();
-            const json = await data; 
-            this.setState({devices: json.devices})
-        } );
+            if(val){
+                console.log('here')
+                this.fetchDevices();
+            }
+        }
+    }
+    fetchUser = ()=>{
+        return new Promise((resolve, reject) => {
+            this.props.firebase.auth().onAuthStateChanged(function (user) {
+                if (user) {
+                    resolve(user)
+                } else {
+                    reject(console.log)
+                }
+            })
+        })
+    }
+    fetchDevices = async ()=>{
+        const { firebase, auth, projects, dispatch, spotifyReducer} = this.props
+        let user = await this.fetchUser()
+        const accessRef = this.props.firebase.database().ref(`users/${user.uid}/accessToken`);
+        const refreshToken = this.props.firebase.database().ref(`users/${user.uid}/refreshToken`);
+        const snapshotAccess = await accessRef.once('value');
+        const snapshotRefresh = await refreshToken.once('value');
+        const body = {
+            name: user.uid,
+            access_token: snapshotAccess.val(), 
+            refresh_token: snapshotRefresh.val(), 
+        }
+        console.log(body)
+        const response = await fetch('/devices',{
+            headers: {
+                'Accept': 'application/json, text/plain, ',
+                'Content-Type': 'application/json'
+            },
+            method: "POST",
+            body: JSON.stringify(body)  
+        })
+        const data = await response.json();
+        if(data.devices != undefined){
+            this.setState({devices: data.devices})
+        }
+    }
+    componentWillMount(){
+        this.fetchDevices();
     }
 
     state = {
         newProjectModal: false,
-        devices : [{}],
+        devices : [],
     }
 
     newSubmit = async newProject => {
@@ -113,10 +142,17 @@ export default class Projects extends Component {
 
     render() {
         const { projects, auth, dispatch, spotifyReducer} = this.props
-        const { newProjectModal } = this.state
-
-        if (!isLoaded(projects, auth)) {
+        const { newProjectModal, devices } = this.state
+        if (!isLoaded(projects,auth)) {
             return <LoadingSpinner />
+        }
+        if(devices.length == 0) {
+            return (
+                <div className={classes.container}>
+                    <h1> Open Spotify and Connect Some Devices </h1>        
+                        <LoadingSpinner />
+                </div>
+            )
         }
 
         if (this.props.children) {
@@ -135,22 +171,22 @@ export default class Projects extends Component {
                 <div className={classes.tiles}>
                     <NewProjectTile onClick={() => this.toggleModal('newProject')} />
                     {!isEmpty(projects) && 
-                            map(projects, (project, key) => (
-                                <div>
-                                { auth.email === project.createdBy &&   
-                                <ProjectTile
-                                    key={`${project.name}-Collab-${key}`}
-                                    project={project}
-                                    onCollabClick={this.collabClick}
-                                    onDelete={() => this.deleteProject(key)}
-                                    onSelect={() => dispatch(push(`${LIST_PATH}/${key} `))}
-                                    showDelete={this.getDeleteVisible(key)}
-                                />
-                                }
-                            </div>
-                            ))}
+                    map(projects, (project, key) => (
+                        <div>
+                            { auth.email === project.createdBy &&   
+                            <ProjectTile
+                                key={`${key}-Collab-${key}`}
+                                project={project}
+                                onCollabClick={this.collabClick}
+                                onDelete={() => this.deleteProject(key)}
+                                onSelect={() => dispatch(push(`${LIST_PATH}/${key} `))}
+                                showDelete={this.getDeleteVisible(key)}
+                            />
+                            }
                         </div>
-                    </div>
+                    ))}
+                </div>
+            </div>
         )
     }
 }

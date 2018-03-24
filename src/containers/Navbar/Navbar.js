@@ -13,6 +13,13 @@ import { firebaseConnect, isLoaded, isEmpty } from 'react-redux-firebase'
 import { LIST_PATH, ACCOUNT_PATH, LOGIN_PATH, SIGNUP_PATH } from 'constants'
 import defaultUserImage from 'static/User.png'
 import classes from './Navbar.scss'
+import SvgIcon from 'material-ui/SvgIcon';
+const HomeIcon = (props) => (
+  <SvgIcon {...props}>
+    <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9h-4v4h-2v-4H9V9h4V5h2v4h4v2z" />
+  </SvgIcon>
+);
+
 
 const buttonStyle = {
   color: 'white',
@@ -106,9 +113,14 @@ export default class Navbar extends Component {
     return (
       <AppBar
         title={
-          <Link to={authExists ? LIST_PATH : '/'} className={classes.brand}>
-           Partify 
-          </Link>
+            <div>
+            <Link to={'/'} className={classes.brand}>
+            Partify 
+            </Link>
+            <Link to={authExists ? LIST_PATH : '/'} style={{paddingLeft: 20}}>
+                <HomeIcon />
+            </Link>
+            </div>
         }
         showMenuIconButton={false}
         iconElementRight={rightMenu}
