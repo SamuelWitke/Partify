@@ -2,6 +2,8 @@
 
 ### Install
 ```
+This project requires redis so if you don't have it 
+sudo apt install redis-server
 yarn install
 ```
 
@@ -15,7 +17,7 @@ yarn run:dev
 ### Steps
 ```
 1. Make an account
-2. Host a project name on a device (Right now global)
+2. Host a project name on a device 
 3. Connect to project name (Adding password soon...)
 4. Add songs to queue 
 ```
