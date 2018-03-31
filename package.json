@@ -10,7 +10,7 @@
     "build": "npm run clean && cross-env NODE_ENV=production npm run compile",
     "start:dev": "cross-env NODE_ENV=development webpack-dashboard -p 1234 -c cyan -m -t material -- node build/scripts/start",
     "run:dev": "cross-env NODE_ENV=development nodemon build/scripts/start",
-    "start": "cross-env NODE_ENV=production node build/scripts/start",
+    "start": "NODE_ENV=production node build/scripts/start",
     "heroku-postbuild": "npm run build",
     "lint": "eslint .",
     "lint:fix": "npm run lint -- --fix"
