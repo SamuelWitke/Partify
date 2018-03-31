@@ -63,6 +63,7 @@ class Songs extends Component {
     }
     submitSongs = async props => {
         const {name} = this.props.params;
+        const {auth} = this.props;
         const {songs} = this.state;
         if(songs.length > 0){
             songs.forEach( song => {
@@ -70,6 +71,7 @@ class Songs extends Component {
                     name: name,
                     votedBy: '',
                     votes: 0,
+                    submitedBy: auth.uid,
                 }
             });
             const accessRef = this.props.firebase.database().ref(`projects/${name}/access_token`);

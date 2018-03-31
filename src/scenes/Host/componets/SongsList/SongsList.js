@@ -13,6 +13,8 @@ import { connect } from 'react-redux'
 import {GridList, GridTile} from 'material-ui/GridList';
 import { success, error, warning, info, removeAll } from 'react-notification-system-redux';
 import { firebaseConnect, getVal } from 'react-redux-firebase'
+import IconButton from 'material-ui/IconButton'
+import DeleteIcon from 'material-ui/svg-icons/action/delete'
 
 const styles = {
     root: {
@@ -47,37 +49,46 @@ export default class SongsList extends Component {
         }))
 
     }
+    onDelete = (song,id) => {
+        console.log(id)
+        let refVote = this.props.firebase.database().ref(`projects/${this.props.name}/Songs/${id}/`).remove();
+        this.props.dispatch(success({
+            title: 'Song Deleted',
+            position: 'tr',
+        }))
+    }
     render() {
         const { songs,auth,uid } = this.props 
-        map( songs, (song, id)  => {
-        console.log(typeof song.song.project.votedBy == 'object' ? Object.keys(song.song.project.votedBy).map( key => key).includes(uid):false,uid)})
- 
         return(
             <Paper>
                 {!isEmpty(songs) ? (
-            <div className={classes.list}>
-                    <div style={styles.root}>
-                        <Subheader>Songs</Subheader>
-                        <GridList
-                            cols={1}
-                            cellHeight={180}
-                            style={styles.gridList}
-                        >
-                            {map( songs, (song, id)  => (
-                                <span>
-                                    {/* forgive me lord I have sinned */}
-                                <TodoItem
-                                    disabled = {typeof song.song.project.votedBy == 'object' ? Object.keys(song.song.project.votedBy).map( key => key).includes(uid)  : false}
-                                    song={song.song}
-                                    onCompleteClick={this.toggleDone}
-                                    id={id}
-                                    key={id}
-                                />
-                            </span>
-                            ))}
-                        </GridList >
+                    <div className={classes.list}>
+                        <div style={styles.root}>
+                            <Subheader>Songs</Subheader>
+                            <GridList
+                                cols={1}
+                                cellHeight={180}
+                                style={styles.gridList}
+                            >
+                                { map( songs, (song, id)  => {
+                                    const disabled = typeof song.song.project.votedBy == 'object' ? Object.keys(song.song.project.votedBy).map( key => key).includes(uid)  : false;
+                                    const visableDelete = song.song.project.submitedBy === uid
+                                    return (
+                                    <span>
+                                        <TodoItem
+                                            disabled = {disabled}
+                                            song={song.song}
+                                            onCompleteClick={this.toggleDone}
+                                            visableDelete={visableDelete}
+                                            onDeleteClick = {this.onDelete}
+                                            id={id}
+                                            key={id}
+                                        />
+                                    </span>
+                                    )})}
+                            </GridList >
+                        </div>
                     </div>
-        </div>
                 ) : (
                     <div className={classes.empty}>No songs</div>
                 )}

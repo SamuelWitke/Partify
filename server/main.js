@@ -84,12 +84,18 @@ admin.database().ref('/projects').on("child_added", function(snapshot) {
         let song = snapshot.val()
         kue.Job.get( song.song.song_id, function( err, job ) {
             job.priority(-song.song.project.votes).update(() => {
-                console.log("Changed",song.song.project.votes,song.song.song_id,song.song.name,job.data.title);
+                logger.info("Changed",song.song.project.votes,song.song.song_id,song.song.name,job.data.title);
             })
         });
-
-    }
-    )
+    })
+    ref.on("child_removed", function(snapshot) {
+        console.log('Child '+snapshot.val()+' was removed');
+        let song = snapshot.val()
+        kue.Job.get( song.song.song_id, function( err, job ) {
+            job.remove();
+            logger.info("Song",song.song.name,"removed")
+        })
+    })
 });
 
 const routes = require('./routes');
