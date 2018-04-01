@@ -17,7 +17,6 @@ const compiler = webpack(webpackConfig)
 
 
 if (project.env === 'development') {
-const kue = require('./kueStart.js')
 const dotenv = require('dotenv');
 const result = dotenv.config();
 dotenv.load();
@@ -71,6 +70,7 @@ dotenv.load();
     // server in production.
 }
 const info = require('../.auth.js');
+const kue = require('./kueStart.js')
 
 admin.initializeApp({
     credential: admin.credential.cert(info.firebase),
