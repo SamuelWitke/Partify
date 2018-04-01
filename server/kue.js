@@ -1,8 +1,20 @@
 const kue = require('./kueStart.js') 
 const logger = require('../build/lib/logger')
-const jobs = kue.createQueue({
-      redis: process.env.REDIS_URL
-});
+
+var kueOptions = {};
+
+if(process.env.REDISTOGO_URL) {
+    var redisUrl = url.parse(process.env.REDISTOGO_URL);
+    kueOptions.redis = {
+        port: parseInt(redisUrl.port),
+        host: redisUrl.hostname
+    };
+    if(redisUrl.auth) {
+        kueOptions.redis.auth = redisUrl.auth.split(':')[1];
+    }
+}
+
+var jobs = kue.createQueue(kueOptions);
 const request = require('request');
 const refreshToken = require('./refreshToken.js')
 var querystring = require('querystring');
