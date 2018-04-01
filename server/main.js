@@ -13,15 +13,14 @@ const compiler = webpack(webpackConfig)
 
 
 const kue = require('./kueStart.js')
-
+const dotenv = require('dotenv');
+const result = dotenv.config();
+dotenv.load();
 // make sure we use the Heroku Redis To Go URL
 // (put REDISTOGO_URL=redis://localhost:6379 in .env for local testing)
 
 
 if (project.env === 'development') {
-    const dotenv = require('dotenv');
-    const result = dotenv.config();
-    dotenv.load();
     //const kueUiExpress = require('kue-ui-express');
     //kueUiExpress(app, '/kue/', '/kue-api/');
     //app.use('/kue-api/', kue.app);

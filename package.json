@@ -4,7 +4,7 @@
   "description": "Host and play songs on spotify",
   "main": "index.js",
   "scripts": {
-    "clean:redis" : "redis-cli flushall",
+    "clean:redis": "redis-cli flushall",
     "clean": " rimraf dist",
     "compile": "node build/scripts/compile",
     "build": "npm run clean && cross-env NODE_ENV=production npm run compile",
@@ -14,10 +14,6 @@
     "heroku-postbuild": "npm run build",
     "lint": "eslint .",
     "lint:fix": "npm run lint -- --fix"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/testuser/material.git"
   },
   "author": "testuser (https://github.com/testuser)",
   "license": "MIT",
@@ -66,9 +62,7 @@
     "spotify-web-api-js": "^0.23.0",
     "spotify-web-api-node": "^2.5.0",
     "svg-inline-loader": "^0.8.0",
-    "whatwg-fetch": "^2.0.3"
-  },
-  "devDependencies": {
+    "whatwg-fetch": "^2.0.3",
     "babel-core": "^6.24.1",
     "babel-eslint": "^7.2.3",
     "babel-loader": "^7.0.0",
