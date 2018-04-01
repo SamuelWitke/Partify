@@ -1,9 +1,10 @@
 # Partify 
 
-### Install
+### How To Install
 ```
 This project requires redis so if you don't have it 
 sudo apt install redis-server
+Get Api keys for Spotify and firebase
 yarn install
 ```
 
