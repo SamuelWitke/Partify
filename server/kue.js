@@ -1,10 +1,11 @@
 const kue = require('./kueStart.js') 
 const logger = require('../build/lib/logger')
+const url = require('url')
 
 var kueOptions = {};
 
-if(process.env.REDISTOGO_URL) {
-    var redisUrl = url.parse(process.env.REDISTOGO_URL);
+if(process.env.REDISCLOUD_URL) {
+    var redisUrl = url.parse(process.env.REDISCLOUD_URL);
     kueOptions.redis = {
         port: parseInt(redisUrl.port),
         host: redisUrl.hostname

@@ -1,9 +1,17 @@
 const express = require('express')
+const project = require('../project.config')
+
+if (project.env === 'development') {
+const dotenv = require('dotenv');
+const result = dotenv.config();
+dotenv.load();
+}
+
+
 const path = require('path')
 const webpack = require('webpack')
 const logger = require('../build/lib/logger')
 const webpackConfig = require('../build/webpack.config')
-const project = require('../project.config')
 const compress = require('compression')
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
@@ -17,9 +25,6 @@ const compiler = webpack(webpackConfig)
 
 
 if (project.env === 'development') {
-const dotenv = require('dotenv');
-const result = dotenv.config();
-dotenv.load();
 
     //const kueUiExpress = require('kue-ui-express');
     //kueUiExpress(app, '/kue/', '/kue-api/');
