@@ -1,6 +1,7 @@
 const kue = require('kue');
 const url = require('url')
 const redis = require('kue/node_modules/redis');
+console.log(process.env.redisPort)
 
 kue.redis.createClient = () =>{
     return redis.createClient(
