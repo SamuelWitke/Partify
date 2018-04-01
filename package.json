@@ -1,5 +1,5 @@
 {
-  "name": "react-redux-firebase-material-example",
+  "name": "partify",
   "version": "0.0.1",
   "description": "Host and play songs on spotify",
   "main": "index.js",
