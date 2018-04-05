@@ -1,5 +1,4 @@
-# Partify 
-
+# Partify [demo](https://partifystart.herokuapp.com/#/)
 ### How To Install
 ```
 This project requires redis so if you don't have it 
