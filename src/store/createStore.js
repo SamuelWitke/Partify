@@ -29,7 +29,6 @@ export default (initialState = {}) => {
   const middleware = [
     thunk.withExtraArgument(getFirebase),
 		reactRouterMiddleware,
-		logger,
 		getCookiesMiddleware(Cookies),
     // This is where you add other middleware like redux-observable
   ]
