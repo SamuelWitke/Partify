@@ -15,118 +15,121 @@ import defaultUserImage from 'static/User.png'
 import classes from './Navbar.scss'
 import SvgIcon from 'material-ui/SvgIcon';
 const HomeIcon = (props) => (
-  <SvgIcon {...props}>
-    <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9h-4v4h-2v-4H9V9h4V5h2v4h4v2z" />
-  </SvgIcon>
+    <SvgIcon {...props}>
+        <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9h-4v4h-2v-4H9V9h4V5h2v4h4v2z" />
+    </SvgIcon>
 );
 
 
 const buttonStyle = {
-  color: 'white',
-  textDecoration: 'none',
-  alignSelf: 'center'
+    color: 'white',
+    textDecoration: 'none',
+    alignSelf: 'center'
 }
 
 const avatarStyles = {
-  wrapper: { marginTop: 0 },
-  button: { marginRight: '.5rem', width: '200px', height: '64px' },
-  buttonSm: {
-    marginRight: '.5rem',
-    width: '30px',
-    height: '64px',
-    padding: '0'
-  }
+    wrapper: { marginTop: 0 },
+    button: { marginRight: '.5rem', width: '200px', height: '64px' },
+    buttonSm: {
+        marginRight: '.5rem',
+        width: '30px',
+        height: '64px',
+        padding: '0'
+    }
 }
 
 @firebaseConnect()
 @connect(({ firebase: { auth, profile } }) => ({
-  auth,
-  profile
+    auth,
+    profile
 }))
 export default class Navbar extends Component {
-  static contextTypes = {
-    router: PropTypes.object.isRequired
-  }
+    static contextTypes = {
+        router: PropTypes.object.isRequired
+    }
 
-  static propTypes = {
-    profile: PropTypes.object,
-    auth: PropTypes.object,
-    firebase: PropTypes.object.isRequired
-  }
+    static propTypes = {
+        profile: PropTypes.object,
+        auth: PropTypes.object,
+        firebase: PropTypes.object.isRequired
+    }
 
-  handleLogout = () => {
-    this.props.firebase.logout()
-    this.context.router.push('/')
-  }
+    handleLogout = () => {
+        this.props.firebase.logout()
+        this.context.router.push('/')
+    }
 
-  render() {
-    const { profile, auth } = this.props
-    const dataLoaded = isLoaded(auth, profile)
-    const authExists = isLoaded(auth) && !isEmpty(auth)
+    render() {
+        const { profile, auth } = this.props
+        const dataLoaded = isLoaded(auth, profile)
+        const authExists = isLoaded(auth) && !isEmpty(auth)
 
-    const iconButton = (
-      <IconButton style={avatarStyles.button} disableTouchRipple>
-        <div className={classes.avatar}>
-          <div className="hidden-mobile">
-            <Avatar
-              src={
-                profile && profile.avatarUrl
-                  ? profile.avatarUrl
-                  : defaultUserImage
-              }
+        const iconButton = (
+            <IconButton style={avatarStyles.button} disableTouchRipple>
+                <div className={classes.avatar}>
+                    <div className="hidden-mobile">
+                        <Avatar
+                            src={
+                                profile && profile.avatarUrl
+                                ? profile.avatarUrl
+                                : defaultUserImage
+                            }
+                        />
+                    </div>
+                    <div className={classes['avatar-text']}>
+                        <span className={`${classes['avatar-text-name']} hidden-mobile`}>
+                            {profile && profile.displayName ? profile.displayName : 'User'}
+                        </span>
+                        <DownArrow color="white" />
+                    </div>
+                </div>
+            </IconButton>
+        )
+
+        const rightMenu =
+            dataLoaded && authExists ? (
+                <IconMenu
+                    iconButtonElement={iconButton}
+                    targetOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                    anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
+                    animated={false}>
+                    <MenuItem
+                        primaryText="Account"
+                        onTouchTap={() => this.context.router.push(ACCOUNT_PATH)}
+                    />
+                    <MenuItem primaryText="Sign out" onTouchTap={this.handleLogout} />
+                </IconMenu>
+            ) : (
+                <div className={classes.menu}>
+                    <Link to={SIGNUP_PATH}>
+                        <FlatButton label="Sign Up" style={buttonStyle} />
+                    </Link>
+                    <Link to={LOGIN_PATH}>
+                        <FlatButton label="Login" style={buttonStyle} />
+                    </Link>
+                </div>
+            )
+
+        return (
+            <AppBar
+                title={
+                    <div>
+                        <Link to={'/'} className={classes.brand}>
+                            Partify 
+                        </Link>
+                        { authExists &&
+                                <Link to={ LIST_PATH } style={{paddingLeft: 20}}>
+                                    <HomeIcon />
+                                </Link>
+
+                        }
+                    </div>
+                }
+                showMenuIconButton={false}
+                iconElementRight={rightMenu}
+                iconStyleRight={authExists ? avatarStyles.wrapper : {}}
+                className={classes.appBar}
             />
-          </div>
-          <div className={classes['avatar-text']}>
-            <span className={`${classes['avatar-text-name']} hidden-mobile`}>
-              {profile && profile.displayName ? profile.displayName : 'User'}
-            </span>
-            <DownArrow color="white" />
-          </div>
-        </div>
-      </IconButton>
-    )
-
-    const rightMenu =
-      dataLoaded && authExists ? (
-        <IconMenu
-          iconButtonElement={iconButton}
-          targetOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-          anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
-          animated={false}>
-          <MenuItem
-            primaryText="Account"
-            onTouchTap={() => this.context.router.push(ACCOUNT_PATH)}
-          />
-          <MenuItem primaryText="Sign out" onTouchTap={this.handleLogout} />
-        </IconMenu>
-      ) : (
-        <div className={classes.menu}>
-          <Link to={SIGNUP_PATH}>
-            <FlatButton label="Sign Up" style={buttonStyle} />
-          </Link>
-          <Link to={LOGIN_PATH}>
-            <FlatButton label="Login" style={buttonStyle} />
-          </Link>
-        </div>
-      )
-
-    return (
-      <AppBar
-        title={
-            <div>
-            <Link to={'/'} className={classes.brand}>
-            Partify 
-            </Link>
-            <Link to={authExists ? LIST_PATH : '/'} style={{paddingLeft: 20}}>
-                <HomeIcon />
-            </Link>
-            </div>
-        }
-        showMenuIconButton={false}
-        iconElementRight={rightMenu}
-        iconStyleRight={authExists ? avatarStyles.wrapper : {}}
-        className={classes.appBar}
-      />
-    )
-  }
+        )
+    }
 }
