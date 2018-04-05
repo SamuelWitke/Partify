@@ -145,7 +145,6 @@ class Songs extends Component {
         })
             .then(data => {return data.json()})
             .then(text => {
-                console.log("here",text.tracks.items)
                 if(text.tracks.items.length === 0){
                     const notificationOpts = {
                         title: 'Search Had No Results',

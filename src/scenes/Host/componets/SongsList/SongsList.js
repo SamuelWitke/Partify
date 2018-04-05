@@ -50,7 +50,6 @@ export default class SongsList extends Component {
 
     }
     onDelete = (song,id) => {
-        console.log(id)
         let refVote = this.props.firebase.database().ref(`projects/${this.props.name}/Songs/${id}/`).remove();
         this.props.dispatch(success({
             title: 'Song Deleted',

@@ -29,7 +29,6 @@ export default function reduce(state = initialState, action) {
 			user: Object.assign({}, state.user, action.data)}); 
 	case DEVICES:                                                                              
 		const {devices} = action;                                                         
-		console.log("HERE",devices);
 		return Object.assign({}, state, {devices});
 	default:
 		return state; 

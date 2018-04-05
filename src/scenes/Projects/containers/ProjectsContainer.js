@@ -49,14 +49,12 @@ export default class Projects extends Component {
 
     componentWillUpdate(oldProps,oldState){
         if(oldState.devices.length > 0 && this.state.devices.length > 0){
-            console.log('here')
             let val = false;
             oldState.devices.forEach( (item,i) =>{
                 if(item.id !== this.state.devices[i].id)
                     val = true;
             })
             if(val){
-                console.log('here')
                 this.fetchDevices();
             }
         }
@@ -84,7 +82,6 @@ export default class Projects extends Component {
             access_token: snapshotAccess.val(), 
             refresh_token: snapshotRefresh.val(), 
         }
-        console.log(body)
         const response = await fetch('/devices',{
             headers: {
                 'Accept': 'application/json, text/plain, ',
