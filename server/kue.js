@@ -8,7 +8,7 @@ const request = require('request');
 const refreshToken = require('./refreshToken.js')
 var querystring = require('querystring');
 
-jobs.process( 'song', function ( job, done ) {
+jobs.process('song',20, function ( job, done ) {
     let access_token = `${job.data.access_token}`
     var headers = {
     'Accept': 'application/json',
