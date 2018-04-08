@@ -79,8 +79,9 @@ const redis = require ('redis');
 const url = require('url')
 let redisUrl = url.parse(process.env.REDISCLOUD_URL||"127.0.0.1");
 const kue = require('kue');
-
 redisClient = redis.createClient(parseInt(redisUrl.port), redisUrl.hostname);
+redisClient.auth(redisUrl.auth.split(':')[1]);
+
 kue.redis.createClient = function () {
     return redisClient;
 };
