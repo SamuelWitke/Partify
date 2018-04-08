@@ -1,7 +1,6 @@
 const url = require('url')
 const kue = require('kue')
-var kueOptions = {};
-var jobs = kue.createQueue(kueOptions);
+const kueOptions = {};
 
 if(process.env.REDISCLOUD_URL) {
     var redisUrl = url.parse(process.env.REDISCLOUD_URL);
@@ -13,5 +12,6 @@ if(process.env.REDISCLOUD_URL) {
        kueOptions.redis.auth = redisUrl.auth.split(':')[1];
     }
 }
+const jobs = kue.createQueue(kueOptions);
 
 module.exports = jobs;
