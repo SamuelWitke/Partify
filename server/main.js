@@ -75,7 +75,15 @@ if (project.env === 'development') {
     // server in production.
 }
 const info = require('../.auth.js');
-const kue = require('kue')
+const kue = require('kue');
+const redis = require ('redis');
+const url = require('url')
+let redisUrl = url.parse(process.env.REDISCLOUD_URL||"127.0.0.1");
+redisClient = redis.createClient(parseInt(redisUrl.port), redisUrl.hostname);
+kue.redis.createClient = function () {
+    return redisClient;
+};
+
 
 admin.initializeApp({
     credential: admin.credential.cert(info.firebase),
