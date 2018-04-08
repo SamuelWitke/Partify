@@ -175,7 +175,7 @@ router.post('/song-queue', (req, res) => {
             access_token: access_token,
             refresh_token: refresh_token,
             device: device,
-            key: "",
+            key: admin.database().ref(`projects/${song.project.name}/Songs`).push({song}).key,
         })
             .priority(song.project.votes)
             .save( err =>{
@@ -184,13 +184,9 @@ router.post('/song-queue', (req, res) => {
                     res.json(err.msg)
                 }else {
                     song.song_id = songJob.id;
-                    key = admin.database().ref(`projects/${song.project.name}/Songs`).push({song})
+                    admin.database().ref(`projects/${song.project.name}/Songs/${songJob.data.key}/song/song_id`).set(songJob.id)
                 }
             })
-        songJob.on( 'complete', function () {
-            logger.success("Song finished",song.name);
-            key.remove();
-        });
     });
     res.sendStatus(200);
 });

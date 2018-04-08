@@ -1,14 +1,17 @@
-const redis = require('kue/node_modules/redis');
-const kue = require('kue');
 const url = require('url')
+const kue = require('kue')
+var kueOptions = {};
+var jobs = kue.createQueue(kueOptions);
 
-kue.redis.createClient = function() {
-    var redisUrl = url.parse(process.env.REDISTOGO_URL)
-      , client = redis.createClient(redisUrl.port, redisUrl.hostname);
-    if (redisUrl.auth) {
-        client.auth(redisUrl.auth.split(":")[1]);
+if(process.env.REDISCLOUD_URL) {
+    var redisUrl = url.parse(process.env.REDISCLOUD_URL);
+    kueOptions.redis = {
+       port: parseInt(redisUrl.port),
+       host: redisUrl.hostname
+    };
+    if(redisUrl.auth) {
+       kueOptions.redis.auth = redisUrl.auth.split(':')[1];
     }
-    return client;
-};
+}
 
-module.exports = kue;
+module.exports = jobs;

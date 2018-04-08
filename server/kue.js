@@ -1,21 +1,9 @@
-const kue = require('./kueStart.js') 
 const logger = require('../build/lib/logger')
 const url = require('url')
+const admin = require('firebase-admin');
 
-var kueOptions = {};
+var jobs = require('./kueStart.js');
 
-if(process.env.REDISCLOUD_URL) {
-    var redisUrl = url.parse(process.env.REDISCLOUD_URL);
-    kueOptions.redis = {
-        port: parseInt(redisUrl.port),
-        host: redisUrl.hostname
-    };
-    if(redisUrl.auth) {
-        kueOptions.redis.auth = redisUrl.auth.split(':')[1];
-    }
-}
-
-var jobs = kue.createQueue(kueOptions);
 const request = require('request');
 const refreshToken = require('./refreshToken.js')
 var querystring = require('querystring');
@@ -27,6 +15,7 @@ jobs.process( 'song', 1, function ( job, done ) {
     'Content-Type': 'application/json',
     'Authorization': 'Bearer '+access_token,
     };
+    console.log(job.data)
 
     var dataString = `{"uris":["${job.data.uri}"]}`;
     var device = job.data.device;
@@ -39,8 +28,17 @@ jobs.process( 'song', 1, function ( job, done ) {
     function callback(error, response, body) {
         console.log(body)
         if (!error) {
-            logger.info("Playing",job.data.title)
+            logger.info("Playing",job.data.title);
+            //admin.database().ref(`projects/${job.data.project}/Songs/${job.data.key}`);
             setTimeout( function () {
+                let del_ref = admin.database().ref(`projects/${job.data.project}/Songs/${job.data.key}`);
+                del_ref.remove()
+                .then(function() {
+                    logger.info('song removed');
+                })
+                .catch(function(error) {
+                    console.log('Error deleting data:', error);
+                });
                 done();
             }, job.data.time);
         }else {
@@ -53,6 +51,7 @@ jobs.process( 'song', 1, function ( job, done ) {
     }
     request(options, callback);	
 } );
+
 
 module.exports = jobs;
 

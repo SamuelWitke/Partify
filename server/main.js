@@ -75,7 +75,7 @@ if (project.env === 'development') {
     // server in production.
 }
 const info = require('../.auth.js');
-const kue = require('./kueStart.js')
+const kue = require('kue')
 
 admin.initializeApp({
     credential: admin.credential.cert(info.firebase),
@@ -94,11 +94,13 @@ admin.database().ref('/projects').on("child_added", function(snapshot) {
         });
     })
     ref.on("child_removed", function(snapshot) {
-        console.log('Child '+snapshot.val()+' was removed');
         let song = snapshot.val()
-        kue.Job.get( song.song.song_id, function( err, job ) {
-            job.remove();
-            logger.info("Song",song.song.name,"removed")
+        logger.info("Song",song.song.name,"removed",song.song.song_id)
+        kue.Job.get(song.song.song_id, function( err, job ) {
+            if(!err){
+                job.remove();
+                logger.info("Song",song.song.name,"removed")
+            }
         })
     })
 });
