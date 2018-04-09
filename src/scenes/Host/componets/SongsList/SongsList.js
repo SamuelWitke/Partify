@@ -39,25 +39,32 @@ export default class SongsList extends Component {
     toggleDone = (song,id) => {
         let refVote = this.props.firebase.database().ref(`projects/${this.props.name}/Songs/${id}/song/project/votes`)
         let refBy = this.props.firebase.database().ref(`projects/${this.props.name}/Songs/${id}/song/project/votedBy/${this.props.uid}`).set(this.props.uid);
-        //this.props.firebase.database().ref(`projects/${this.props.name}/Songs/${id}/song/project/votedBy/${refBy}`).set(this.props.auth.uid)
         refVote.transaction( (votes) => {
             return (votes || 0) + 1;
         });
-        this.props.dispatch(success({
-            title: 'Song Upvoted',
+        this.props.dispatch(info({
+            title: song.name+" Upvoted ",
             position: 'tr',
         }))
 
     }
     onDelete = (song,id) => {
         let refVote = this.props.firebase.database().ref(`projects/${this.props.name}/Songs/${id}/`).remove();
-        this.props.dispatch(success({
+        this.props.dispatch(info({
             title: 'Song Deleted',
             position: 'tr',
         }))
     }
+        /*
+    sendActiveMsg=() =>{
+        this.props.dispatch(success({
+            title: 'Song Submitted is Playing',
+            position: 'tr',
+        }))
+    }
+    */
     render() {
-        const { songs,auth,uid } = this.props 
+        const {songs,auth,uid } = this.props 
         return(
             <Paper>
                 {!isEmpty(songs) ? (
@@ -66,22 +73,26 @@ export default class SongsList extends Component {
                             <Subheader>Songs</Subheader>
                             <GridList
                                 cols={1}
-                                cellHeight={180}
+                                padding={1}
+                                cellHeight={200}
                                 style={styles.gridList}
                             >
                                 { map( songs, (song, id)  => {
                                     const disabled = typeof song.song.project.votedBy == 'object' ? Object.keys(song.song.project.votedBy).map( key => key).includes(uid)  : false;
                                     const visableDelete = song.song.project.submitedBy === uid
+                                    const active = song.song.active ? true : false;
+                                    // if(active && visableDelete) this.sendActiveMsg();
                                     return (
-                                    <span>
+                                    <span key={id}>
                                         <TodoItem
                                             disabled = {disabled}
                                             song={song.song}
+                                            votes={song.song.project.votes}
+                                            active={active}
                                             onCompleteClick={this.toggleDone}
                                             visableDelete={visableDelete}
                                             onDeleteClick = {this.onDelete}
                                             id={id}
-                                            key={id}
                                         />
                                     </span>
                                     )})}
@@ -95,36 +106,3 @@ export default class SongsList extends Component {
         )
     }
 }
-
-/*
-SongsList.propTypes = {
-    songs: PropTypes.object,
-    toggleDone: PropTypes.func, // from withHandlers
-    deleteTodo: PropTypes.func, // from withHandlers
-    firebase: PropTypes.object // eslint-disable-line react/no-unused-prop-types
-}
-    export default compose(
-        withFirebase, // firebaseConnect() can also be used
-        ,
-        withHandlers({
-            ,
-            deleteTodo: props => id => {
-            const { songs, auth, firebase } = props
-            if (!auth || !auth.uid) {
-                return props.showError('You must be Logged into Delete')
-                }
-// return props.showError('Delete example requires using populate')
-// only works if populated
-            if (songs[id].owner.email !== auth.email) {
-                return props.showError('You must own todo to delete')
-                }
-            return firebase.remove(`songs/${id}`).catch(err => {
-// TODO: Have error caught by epic
-                console.error('Error removing todo: ', err) // eslint-disable-line no-console
-                props.showError('Error Removing todo')
-                return Promise.reject(err)
-                })
-            }
-        })
-    )(SongsList)
-    */

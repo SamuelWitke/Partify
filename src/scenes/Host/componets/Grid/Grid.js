@@ -20,26 +20,27 @@ const styles = {
 
 
 const Grid= ({tilesData, handleTouchTap}) => (
-    <div>
-        <GridList
-            cellHeight={180}
-        >
-            {tilesData.map((tile) => (
-                <GridTile
-                    key={tile.href}
-                    title={tile.name}
-                    subtitle={<span>by <b>{tile.artists.map( artist => <b> { artist.name } </b> )}</b></span>}
-                    actionIcon={
-                        <Checkbox
-                            style={styles.checkbox}
-                            onCheck={ (e) => {handleTouchTap(tile)}}
-                        />
-                    }
-                >
-                    <img src={tile.album.images[0].url} />
-                </GridTile>
-            ))}
-        </GridList>
-    </div>
+    <GridList
+        cellHeight={180}
+        cols={2}
+        cellHeight={200}
+        padding={1}
+    >
+        {tilesData.map((tile) => (
+            <GridTile
+                key={tile.name+tile.album.images[0].url}
+                title={tile.name}
+                subtitle={<span> by <b>{tile.artists.map( artist => <b> { artist.name } </b> )}</b></span>}
+                actionIcon={
+                    <Checkbox
+                        style={styles.checkbox}
+                        onCheck={ (e) => {handleTouchTap(tile)}}
+                    />
+                }
+            >
+                <img src={tile.album.images[0].url} />
+            </GridTile>
+        ))}
+    </GridList>
 );
 export default Grid;

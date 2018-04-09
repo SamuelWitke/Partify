@@ -8,14 +8,14 @@ const request = require('request');
 const refreshToken = require('./refreshToken.js')
 var querystring = require('querystring');
 
-jobs.process('song',20, function ( job, done ) {
+/* Only one worker for free redislabs */
+jobs.process('song',1, function ( job, done ) {
     let access_token = `${job.data.access_token}`
     var headers = {
     'Accept': 'application/json',
     'Content-Type': 'application/json',
     'Authorization': 'Bearer '+access_token,
     };
-    console.log(job.data)
 
     var dataString = `{"uris":["${job.data.uri}"]}`;
     var device = job.data.device;
@@ -26,10 +26,9 @@ jobs.process('song',20, function ( job, done ) {
         body:  dataString
     };
     function callback(error, response, body) {
-        console.log(body)
         if (!error) {
             logger.info("Playing",job.data.title);
-            //admin.database().ref(`projects/${job.data.project}/Songs/${job.data.key}`);
+            admin.database().ref(`projects/${job.data.project}/Songs/${job.data.key}/song/active`).set(true)
             setTimeout( function () {
                 let del_ref = admin.database().ref(`projects/${job.data.project}/Songs/${job.data.key}`);
                 del_ref.remove()

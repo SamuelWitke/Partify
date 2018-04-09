@@ -95,7 +95,6 @@ router.post('/devices', (req,res) => {
             json: true
         };
         request.get(options, function(error, response, body) {
-            console.log(error,body)
             if(body.error == null && body.devices.length > 0){
                 body.devices.forEach( (device) => {
                     devices.push({

@@ -14,11 +14,9 @@ import ActionFavoriteBorder from 'material-ui/svg-icons/action/favorite-border';
 import DeleteIcon from 'material-ui/svg-icons/action/delete'
 
 
-
-
-const TodoItem = ({ disabled,song,visableDelete,key, id, onCompleteClick, onDeleteClick }) => (
+const TodoItem = ({active,disabled,song,visableDelete,id,votes,onCompleteClick, onDeleteClick }) => (
     <GridTile
-        key={song.key}
+        key={id}
         title={
             <div>
                 { visableDelete && 
@@ -29,6 +27,7 @@ const TodoItem = ({ disabled,song,visableDelete,key, id, onCompleteClick, onDele
                 </IconButton>
                 }
                 {song.name}
+                <span className={classes.badge}>{votes}</span>
             </div>
         }
         style={{
@@ -40,16 +39,15 @@ const TodoItem = ({ disabled,song,visableDelete,key, id, onCompleteClick, onDele
             <Checkbox 
                 checkedIcon={<ActionFavorite />}
                 uncheckedIcon={<ActionFavoriteBorder />}
-                disabled={disabled}
-                checked={disabled}
+                disabled={disabled || active}
+                checked={disabled || active}
                 onCheck={() => onCompleteClick(song, song._key || id)}/>
         }
         actionPosition="right"
         titlePosition="top"
-        titleBackground="linear-gradient(to bottom, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.3) 70%,rgba(0,0,0,0) 100%)"
+        titleBackground={active ? "linear-gradient(to bottom,rgba(121,32,116,1) 0%, rgba(82,0,71,1) 0%, rgba(103,29,96,1) 100%": "linear-gradient(to bottom, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.3) 70%,rgba(0,0,0,0) 100%)"}
     >
         <img style={classes.img} src={song.album.images[0].url} />
-
     </GridTile>
 )
 

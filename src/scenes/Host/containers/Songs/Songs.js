@@ -103,7 +103,7 @@ class Songs extends Component {
                             message: 'Vote it up to play next',
                             position: 'tr',
                         };
-                        this.props.dispatch(success(notificationOpts))
+                        this.props.dispatch(info(notificationOpts))
                     }
                 })
                 .catch( err => {
@@ -159,7 +159,7 @@ class Songs extends Component {
                         message: 'Results',
                         position: 'tr',
                     };
-                    this.props.dispatch(success(notificationOpts))
+                    this.props.dispatch(info(notificationOpts))
                     this.setState({items: text.tracks.items});
                     this.forceUpdate();
                 }}
@@ -173,9 +173,7 @@ class Songs extends Component {
     render() {
         const { uid, addNew, onSubmitFail } = this.props 
         return (
-            <div
-                className={classes.container}
-                style={{ color: Theme.palette.primary2Color }}>
+            <div className={classes.container} style={{ color: Theme.palette.primary2Color }}>
                 <SearchBar
                     onChange={this.onChange}
                     onRequestSearch={this.addNew}
