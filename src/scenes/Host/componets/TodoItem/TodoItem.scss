@@ -10,10 +10,15 @@
     display:block;
     margin:auto;
 }
+
+.title{
+    font-family: jaf-bernino-sans-condensed, helvetica, arial, sans-serif;
+    font-size: 1em;
+}
+
 .badge {
     display: inline-block;
-    margin: 5px;
-    padding: .25em .4em;
+    padding: .25em .4em .4em .4em;
     font-size: 75%;
     font-weight: 700;
     line-height: 1;

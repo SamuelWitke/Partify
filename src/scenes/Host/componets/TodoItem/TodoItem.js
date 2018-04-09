@@ -26,7 +26,7 @@ const TodoItem = ({active,disabled,song,visableDelete,id,votes,onCompleteClick, 
                     <DeleteIcon />
                 </IconButton>
                 }
-                {song.name}
+                <span className={classes.title}> {song.name} </span>
                 <span className={classes.badge}>{votes}</span>
             </div>
         }
