@@ -10,8 +10,10 @@ import IconButton from 'material-ui/IconButton';
 import StarBorder from 'material-ui/svg-icons/toggle/star-border';
 import ActionFavorite from 'material-ui/svg-icons/action/favorite';
 import ActionFavoriteBorder from 'material-ui/svg-icons/action/favorite-border';
-
+import Badge from 'material-ui/Badge';
 import DeleteIcon from 'material-ui/svg-icons/action/delete'
+import NotificationsIcon from 'material-ui/svg-icons/social/notifications';
+
 
 
 const TodoItem = ({active,disabled,song,visableDelete,id,votes,onCompleteClick, onDeleteClick }) => (
@@ -26,8 +28,13 @@ const TodoItem = ({active,disabled,song,visableDelete,id,votes,onCompleteClick, 
                     <DeleteIcon />
                 </IconButton>
                 }
-                <span className={classes.title}> {song.name} </span>
-                <span className={classes.badge}>{votes}</span>
+                <Badge
+                    badgeContent={votes}
+                    primary={true}
+                    style={{ height: '1px'}}
+                >
+                    <span className={classes.title}> {song.name} </span>
+                </Badge>
             </div>
         }
         style={{
