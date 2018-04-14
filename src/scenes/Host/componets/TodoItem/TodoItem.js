@@ -13,6 +13,7 @@ import ActionFavoriteBorder from 'material-ui/svg-icons/action/favorite-border';
 import Badge from 'material-ui/Badge';
 import DeleteIcon from 'material-ui/svg-icons/action/delete'
 import NotificationsIcon from 'material-ui/svg-icons/social/notifications';
+import ThumbUp from 'material-ui/svg-icons/action/thumb-up';
 
 
 
@@ -37,7 +38,7 @@ const TodoItem = ({ author, active, disabled, song, visableDelete, id, votes, on
                 </Badge>
             </div>
         }
-        subtitle={"Submitted by" + author}
+        subtitle={"Song Submitted by " + author}
         style={{
             padding: '15%',
             width: '100%',
@@ -45,8 +46,8 @@ const TodoItem = ({ author, active, disabled, song, visableDelete, id, votes, on
         }}
         actionIcon={
             <Checkbox 
-                checkedIcon={<ActionFavorite />}
-                uncheckedIcon={<ActionFavoriteBorder />}
+                checkedIcon={<ThumbUp />}
+                uncheckedIcon={<ThumbUp />}
                 disabled={disabled || active}
                 checked={disabled || active}
                 onCheck={() => onCompleteClick(song, song._key || id)}/>

@@ -8,7 +8,7 @@ import { withNotifications } from 'modules/notification'
 import Grid from '../../componets/Grid/Grid.js';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import classes from './Songs.scss'
-import ContentAdd from 'material-ui/svg-icons/content/add';
+import ContentAdd from 'material-ui/svg-icons/content/send';
 import { success, error, warning, info, removeAll } from 'react-notification-system-redux';
 import SearchBar from 'material-ui-search-bar';
 import {push} from 'react-router-redux'
@@ -25,9 +25,10 @@ const fixedbutton = {
 
 @firebaseConnect([{ path: '/projects' }])
 @connect(
-    ({ firebase, firebase: { auth, data: { projects } } }, { params }) => ({
+    ({ firebase, firebase: { auth, data: { projects }, profile } }, { params }) => ({
         auth,
         projects: populate(firebase, 'projects', populates),
+        profile,
         params: params
     }))
 
@@ -63,7 +64,7 @@ class Songs extends Component {
     }
     submitSongs = async props => {
         const {name} = this.props.params;
-        const {auth} = this.props;
+        const {auth, profile} = this.props;
         const {songs} = this.state;
         if(songs.length > 0){
             songs.forEach( song => {
@@ -72,6 +73,7 @@ class Songs extends Component {
                     votedBy: '',
                     votes: 0,
                     submitedBy: auth.uid,
+                    author: profile.displayName || "Anonymous"
                 }
             });
             const accessRef = this.props.firebase.database().ref(`projects/${name}/access_token`);
@@ -188,7 +190,7 @@ class Songs extends Component {
                     tilesData = {this.state.items}
                     handleTouchTap = { this.onTouchTap }
                 />
-                { this.state.items.length > 0 &&
+                { this.state.items.length > 0 && this.state.songs.length > 0&&
                 <FloatingActionButton 
                     style={fixedbutton}
                     secondary={true}

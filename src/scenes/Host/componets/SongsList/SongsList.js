@@ -82,11 +82,12 @@ export default class SongsList extends Component {
                                     const disabled = typeof song.song.project.votedBy == 'object' ? Object.keys(song.song.project.votedBy).map( key => key).includes(uid)  : false;
                                     const visableDelete = song.song.project.submitedBy === uid
                                     const active = song.song.active ? true : false;
+                                    const author = song.song.project.author;
                                     // if(active && visableDelete) this.sendActiveMsg();
                                     return (
                                     <span key={id}>
                                         <TodoItem
-                                            author={profile.displayName || "Anonymous"}
+                                            author={ author }
                                             disabled = {disabled}
                                             song={song.song}
                                             votes={song.song.project.votes}
