@@ -16,7 +16,7 @@ import NotificationsIcon from 'material-ui/svg-icons/social/notifications';
 
 
 
-const TodoItem = ({active,disabled,song,visableDelete,id,votes,onCompleteClick, onDeleteClick }) => (
+const TodoItem = ({ author, active, disabled, song, visableDelete, id, votes, onCompleteClick, onDeleteClick }) => (
     <GridTile
         key={id}
         title={
@@ -37,6 +37,7 @@ const TodoItem = ({active,disabled,song,visableDelete,id,votes,onCompleteClick, 
                 </Badge>
             </div>
         }
+        subtitle={"Submitted by" + author}
         style={{
             padding: '15%',
             width: '100%',

@@ -30,8 +30,9 @@ const styles = {
     },
 };
 @firebaseConnect()
-@connect(({ firebase, firebase: { auth } }) => ({
+@connect(({ firebase, firebase: { auth, profile }}) => ({
     auth: auth,
+    profile,
     uid: auth.uid,
 }))
 
@@ -64,7 +65,7 @@ export default class SongsList extends Component {
     }
     */
     render() {
-        const {songs,auth,uid } = this.props 
+        const {songs,auth,uid,profile} = this.props 
         return(
             <Paper>
                 {!isEmpty(songs) ? (
@@ -85,6 +86,7 @@ export default class SongsList extends Component {
                                     return (
                                     <span key={id}>
                                         <TodoItem
+                                            author={profile.displayName || "Anonymous"}
                                             disabled = {disabled}
                                             song={song.song}
                                             votes={song.song.project.votes}

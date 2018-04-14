@@ -7,6 +7,7 @@ import {
 import locationReducer from './location'
 import hashHistory  from '../history';
 import spotifyReducer from './spotify.js';
+import hostReducer from './host.js';
 import {reducer as notifications} from 'react-notification-system-redux';
 
 
@@ -19,7 +20,8 @@ export const makeRootReducer = asyncReducers => {
     form,
     location: locationReducer,
     notifications,
-		spotifyReducer,
+    hostReducer,
+    spotifyReducer,
     ...asyncReducers
   })
 }

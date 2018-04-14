@@ -117,7 +117,7 @@ export default class Navbar extends Component {
                         <Link to={'/'} className={classes.brand}>
                             Partify 
                         </Link>
-                        { authExists &&
+                        { auth.email &&
                                 <Link to={ LIST_PATH } style={{paddingLeft: 20}}>
                                     <HomeIcon />
                                 </Link>
