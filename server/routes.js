@@ -174,6 +174,7 @@ router.post('/song-queue', (req, res) => {
             access_token: access_token,
             refresh_token: refresh_token,
             device: device,
+            bar: function () { console.log('secret'); },
             key: admin.database().ref(`projects/${song.project.name}/Songs`).push({song}).key,
         })
             .priority(song.project.votes)

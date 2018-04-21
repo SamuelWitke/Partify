@@ -2,11 +2,10 @@ const express = require('express')
 const project = require('../project.config')
 
 if (project.env === 'development') {
-const dotenv = require('dotenv');
-const result = dotenv.config();
-dotenv.load();
+    const dotenv = require('dotenv');
+    const result = dotenv.config();
+    dotenv.load();
 }
-
 
 const path = require('path')
 const webpack = require('webpack')
@@ -22,7 +21,6 @@ const compiler = webpack(webpackConfig)
 
 // make sure we use the Heroku Redis To Go URL
 // (put REDISTOGO_URL=redis://localhost:6379 in .env for local testing)
-
 
 if (project.env === 'development') {
 
@@ -79,6 +77,7 @@ const redis = require ('redis');
 const url = require('url')
 let redisUrl = url.parse(process.env.REDISCLOUD_URL||"127.0.0.1");
 const kue = require('kue');
+
 redisClient = redis.createClient(parseInt(redisUrl.port), redisUrl.hostname);
 if(redisUrl.auth)
     redisClient.auth(redisUrl.auth.split(':')[1]);
@@ -86,7 +85,6 @@ if(redisUrl.auth)
 kue.redis.createClient = function () {
     return redisClient;
 };
-
 
 admin.initializeApp({
     credential: admin.credential.cert(info.firebase),
@@ -99,20 +97,37 @@ admin.database().ref('/projects').on("child_added", function(snapshot) {
     ref.on("child_changed", function(snapshot) {
         let song = snapshot.val()
         kue.Job.get( song.song.song_id, function( err, job ) {
-            job.priority(-song.song.project.votes).update(() => {
-                logger.info("Changed",song.song.project.votes,song.song.song_id,song.song.name,job.data.title);
-            })
+            try{
+                job.priority(-song.song.project.votes).update(() => {
+                    if(!err){
+                        logger.info("Changed",song.song.project.votes,song.song.song_id,song.song.name,job.data.title);
+                    }
+                })
+            }catch(e){
+                logger.error(e.message)
+            }
+
         });
     })
     ref.on("child_removed", function(snapshot) {
         let song = snapshot.val()
         logger.info("Song",song.song.name,"removed",song.song.song_id)
-        kue.Job.get(song.song.song_id, function( err, job ) {
-            if(!err){
-                job.remove();
-                logger.info("Song",song.song.name,"removed")
+        try{
+            kue.Job.get(song.song.song_id, function( err, job ) {
+                if(!err){
+                    try{
+                    console.log(job.state('active'))
+                    job.state('active');
+                    job.remove();
+                    logger.info("Song",song.song.name,"removed")
+                    }catch(e){
+                      logger.error(e.message)
+                    }
             }
         })
+        }catch(e){
+            logger.error(e.message)
+        }
     })
 });
 

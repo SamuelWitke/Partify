@@ -49,7 +49,11 @@ jobs.process('song',1, function ( job, done ) {
 
     }
     request(options, callback);	
+     //Store the job's done function in a global variable so we can access it from elsewhere.
+    
 } );
+
+//Store the job's done function in a global variable so we can access it from elsewhere.
 
 
 module.exports = jobs;

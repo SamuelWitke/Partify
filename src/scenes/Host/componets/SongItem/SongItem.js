@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import classes from './TodoItem.scss'
+import classes from './SongItem.scss'
 import { ListItem } from 'material-ui/List'
 import Checkbox from 'material-ui/Checkbox'
 import Delete from 'material-ui/svg-icons/action/delete'
@@ -15,9 +15,7 @@ import DeleteIcon from 'material-ui/svg-icons/action/delete'
 import NotificationsIcon from 'material-ui/svg-icons/social/notifications';
 import ThumbUp from 'material-ui/svg-icons/action/thumb-up';
 
-
-
-const TodoItem = ({ author, active, disabled, song, visableDelete, id, votes, onCompleteClick, onDeleteClick }) => (
+const SongItem = ({ author, active, disabled, song, visableDelete, id, votes, onCompleteClick, onDeleteClick }) => (
     <GridTile
         key={id}
         title={
@@ -32,7 +30,6 @@ const TodoItem = ({ author, active, disabled, song, visableDelete, id, votes, on
                 <Badge
                     badgeContent={votes}
                     primary={true}
-                    style={{ height: '1px'}}
                 >
                     <span className={classes.title}> {song.name} </span>
                 </Badge>
@@ -60,11 +57,11 @@ const TodoItem = ({ author, active, disabled, song, visableDelete, id, votes, on
     </GridTile>
 )
 
-TodoItem.propTypes = {
+SongItem.propTypes = {
     song: PropTypes.object.isRequired,
     key: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     onDeleteClick: PropTypes.func,
     onCompleteClick: PropTypes.func
 }
 
-export default TodoItem
+export default SongItem; 

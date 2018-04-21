@@ -32,12 +32,13 @@ class Lists extends Component {
     render() {
         const {project} = this.props;
         const songs = project ? project.Songs: null;
-
         return (
             <div> 
                 { songs !== null ?  
                     <div>
-                        <SongsList name={this.props.params.name} songs={songs} /> 
+                        <SongsList 
+                            admin={project.createdBy}
+                            name={this.props.params.name} songs={songs} /> 
                         </div>
                         : <h1> Upload Some Songs </h1> 
                     }

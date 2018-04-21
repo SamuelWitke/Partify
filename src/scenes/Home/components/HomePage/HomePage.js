@@ -1,4 +1,5 @@
 import React from 'react'
+import 'babel-polyfill';
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { compose, withHandlers } from 'recompose'
@@ -12,46 +13,55 @@ import { firebaseConnect, populate } from 'react-redux-firebase'
 import { success, error, warning, info, removeAll } from 'react-notification-system-redux';
 import { setHost } from '../../../../store/host.js';
 
+const mapDispatchToProps = (dispatch)=> {
+    return({
+        changeLocation: (loc) => dispatch(push(loc)),
+        sendError: (errorObj) => dispatch(error(errorObj))
+    })
+}
 
 const enhance = compose(
-    withNotifications, // adds props.showError from notfication module
-     firebaseConnect([]),
-    connect(({ firebase, firebase: { auth } }) => ({
-        uid: auth.uid,
-    })),
+    firebaseConnect([]),
+    connect(
+        ({ firebase, firebase: { auth }}) => ({
+            uid: auth.uid,
+        }),
+        mapDispatchToProps
+    ),
     withHandlers({
         addNew: props => async Host=>{
-            const ref = props.firebase.database().ref(`projects/${Host.code}`);
-            const snapshot = await ref.once('value');
-            const value = snapshot.val();
-            if(value != undefined){
-                if(props.uid == undefined){
-                    props.firebase.auth().signInAnonymously()
-                }
-                props.dispatch(setHost(value.name))
-                props.dispatch(push(`Host/Party/${value.name}`))
-            } else {
-                props.dispatch(error({
-                   title: 'Error',
-                   message: 'Invalid Host Code',
-                   position: 'tr',
-                }));
+            const {sendError, changeLocation, firebase, uid} = props;
+            try{
+                const ref = firebase.database().ref(`projects/${Host.code}`);
+                const snapshot = await ref.once('value');
+                const value = snapshot.val();
+                if(value != undefined){
+                    if(uid == undefined){
+                        firebase.auth().signInAnonymously()
+                    }
+                    changeLocation(`Host/Party/${value.name}`)
+                }else 
+                    throw new Error("Invalid Host Code")
+            }catch(e) {
+                sendError({
+                    title: 'Error',
+                    message: 'Invalid Host Code',
+                    position: 'tr',
+                });
+                console.error(e.message,e.stack)
             }
         },
-        onSubmitFail: props => (formErrs, dispatch, err) =>
-        props.showError(formErrs ? 'Form Invalid' : err.message || 'Error')
     })
 )
 
 const Home = ({ addNew, onSubmitFail }) => (
     <Card className={classes.HomePage}>
         <CardMedia  className={classes.container} overlay={<CardTitle title="Connect or Host" subtitle="A local Spotify Party" />} >
-                <img src={Party} className={classes.glitch}/>
+            <img src={Party} className={classes.glitch}/>
         </CardMedia>
         <Connect
             disabled={false}
             onSubmit={addNew}
-            onSubmitFail={onSubmitFail}
         />
         <CardText className={classes.info}>
             They wanna hear it! Partify lets your guests control the music at home or wherever you are.
@@ -61,7 +71,6 @@ const Home = ({ addNew, onSubmitFail }) => (
 
 Home.propTypes = {
     addNew: PropTypes.func.isRequired,
-    onSubmitFail: PropTypes.func.isRequired,
     uid: PropTypes.string
 }
 

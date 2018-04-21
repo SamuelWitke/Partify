@@ -7,7 +7,7 @@ import { List } from 'material-ui/List'
 import Paper from 'material-ui/Paper'
 import Subheader from 'material-ui/Subheader'
 import { spinnerWhileLoading } from 'utils/components'
-import TodoItem from '../TodoItem'
+import SongItem from '../SongItem'
 import classes from './SongsList.scss'
 import { connect } from 'react-redux'
 import {GridList, GridTile} from 'material-ui/GridList';
@@ -86,7 +86,7 @@ export default class SongsList extends Component {
                                     // if(active && visableDelete) this.sendActiveMsg();
                                     return (
                                     <span key={id}>
-                                        <TodoItem
+                                        <SongItem
                                             author={ author }
                                             disabled = {disabled}
                                             song={song.song}
