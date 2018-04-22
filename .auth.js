@@ -11,12 +11,4 @@ module.exports = {
 		"auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
 		"client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-3smir%40partypeople-b736d.iam.gserviceaccount.com"
 	},
-    firebaseClient: {
-	    apiKey: ""+process.env.apiKey,
-	    authDomain: "partypeople-b736d.firebaseapp.com",
-	    databaseURL: "https://partypeople-b736d.firebaseio.com",
-	    projectId: "partypeople-b736d",
-	    storageBucket: "partypeople-b736d.appspot.com",
-    }
 }
-console.log(process.env.apiKey)
