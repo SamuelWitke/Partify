@@ -9,15 +9,6 @@
 
 export const env = 'development'
 
-// Config from Firebase Console
-export const firebase = {
-	apiKey: "AIzaSyC9z35c77dSgRsqSVh_fLsCBsR3kV_21Y8",
-	authDomain: "partypeople-b736d.firebaseapp.com",
-	databaseURL: "https://partypeople-b736d.firebaseio.com",
-	projectId: "partypeople-b736d",
-	storageBucket: "partypeople-b736d.appspot.com",
-	messagingSenderId: "958613424454"
-}
 
 // Config for react-redux-firebase
 // For more details, visit http://docs.react-redux-firebase.com/history/v2.0.0/docs/api/enhancer.html
@@ -36,4 +27,4 @@ export const reduxFirebase = {
 	// profileDecorator: (userData) => ({ email: userData.email }) // customize format of user profile
 }
 
-export default { env, firebase, reduxFirebase }
+export default { env,  reduxFirebase }
