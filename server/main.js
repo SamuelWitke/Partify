@@ -116,7 +116,6 @@ admin.database().ref('/projects').on("child_added", function(snapshot) {
             kue.Job.get(song.song.song_id, function( err, job ) {
                 if(!err){
                     try{
-                    console.log(job.state('active'))
                     job.state('active');
                     job.remove();
                     logger.info("Song",song.song.name,"removed")
