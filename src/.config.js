@@ -33,4 +33,4 @@ export const reduxFirebase = {
 	// profileDecorator: (userData) => ({ email: userData.email }) // customize format of user profile
 }
 
-export default { env, firebase, reduxFirebase }
+export default { env,  reduxFirebase }
