@@ -11,12 +11,9 @@ export const env = 'development'
 
 // Config from Firebase Console
 export const firebase = {
-	apiKey: "AIzaSyC9z35c77dSgRsqSVh_fLsCBsR3kV_21Y8",
-	authDomain: "partypeople-b736d.firebaseapp.com",
-	databaseURL: "https://partypeople-b736d.firebaseio.com",
-	projectId: "partypeople-b736d",
-	storageBucket: "partypeople-b736d.appspot.com",
-	messagingSenderId: "958613424454"
+	apiKey: process.env.apiKey, 
+	authDomain: `${process.env.projectId}.firebaseapp.com`,
+	databaseURL: `https://${process.env.projectId}.firebaseio.com`,
 }
 
 // Config for react-redux-firebase
