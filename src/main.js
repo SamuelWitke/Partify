@@ -4,6 +4,7 @@ import injectTapEventPlugin from 'react-tap-event-plugin'
 import createStore from './store/createStore'
 import { version } from '../package.json'
 import { env } from './.config'
+import 'babel-polyfill';
 import './styles/core.scss'
 
 // Window Variables

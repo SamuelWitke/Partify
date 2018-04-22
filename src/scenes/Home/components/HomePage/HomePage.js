@@ -1,5 +1,4 @@
 import React from 'react'
-import 'babel-polyfill';
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { compose, withHandlers } from 'recompose'

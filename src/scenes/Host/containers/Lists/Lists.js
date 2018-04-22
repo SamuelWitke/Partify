@@ -6,6 +6,7 @@ import { connect } from 'react-redux'
 import { compose } from 'redux'
 import { firebaseConnect, getVal } from 'react-redux-firebase'
 import SongsList from '../../componets/SongsList/index.js'
+import { UserIsAuthenticated } from 'utils/router'
 
 const fixedbutton = {
     position: 'fixed',
@@ -14,7 +15,14 @@ const fixedbutton = {
     size: '400px'
 }
 
+const mapDispatchToProps = (dispatch)=> {
+    return({
+        changeLocation: (loc) => dispatch(push(loc)),
+        sendError: (errorObj) => dispatch(error(errorObj))
+    })
+}
 
+@UserIsAuthenticated
 @firebaseConnect((props) => {
     return [
         { path: 'projects' }, // create todo listener
@@ -24,34 +32,32 @@ const fixedbutton = {
     {
         project:  firebase.data.projects ? firebase.data.projects[`${props.params.name}`] : "" , // lodash's get can also be used
         uid: auth.uid,
-    }))
+    }),
+    mapDispatchToProps,
+)
+
 class Lists extends Component {
     onClick = e => {
-        this.props.dispatch(push(`Host/Songs/${this.props.params.name}`)) 
+        this.props.changeLocation(`Host/Songs/${this.props.params.name}`) 
     }
     render() {
-        const {project} = this.props;
+        const {project,params} = this.props;
         const songs = project ? project.Songs: null;
         return (
             <div> 
-                { songs !== null ?  
-                    <div>
-                        <SongsList 
-                            admin={project.createdBy}
-                            name={this.props.params.name} songs={songs} /> 
-                        </div>
-                        : <h1> Upload Some Songs </h1> 
-                    }
-                    <FloatingActionButton 
-                        style={fixedbutton}
-                        secondary={true}
-                        onClick={this.onClick}>
-                        <ContentAdd />
-                    </FloatingActionButton>
-                </div>
+                <SongsList 
+                    admin={project.createdBy}
+                    name={params.name} 
+                    songs={songs} /> 
+                <FloatingActionButton 
+                    style={fixedbutton}
+                    secondary={true}
+                    onClick={this.onClick}>
+                    <ContentAdd />
+                </FloatingActionButton>
+            </div>
         );
     }
-
 }
 
 export default Lists;

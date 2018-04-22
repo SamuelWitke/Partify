@@ -9,7 +9,7 @@ import {
     isEmpty
 } from 'react-redux-firebase'
 import { LIST_PATH } from 'constants'
-// import { UserIsAuthenticated } from 'utils/router'
+import { UserIsAuthenticated } from 'utils/router'
 import LoadingSpinner from 'components/LoadingSpinner'
 import ProjectTile from '../components/ProjectTile'
 import NewProjectTile from '../components/NewProjectTile'
@@ -18,9 +18,10 @@ import classes from './ProjectsContainer.scss'
 import { push } from 'react-router-redux'
 
 
+
 const populates = [{ child: 'createdBy', root: 'users' }]
 
-// @UserIsAuthenticated
+@UserIsAuthenticated
 @firebaseConnect([
     { path: '/projects' }
     // 'projects#populate=owner:users' // string equivalent
