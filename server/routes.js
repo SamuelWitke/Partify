@@ -34,6 +34,7 @@ const generateRandomString = N => (Math.random().toString(36)+Array(N).join('0')
  * Redirect the client to the spotify authorize url, but first set that user's
  * state in the cookie.
  */
+
 router.get('/login', (_, res) => {
     const state = generateRandomString(16);
     res.cookie(STATE_KEY, state);
@@ -46,6 +47,7 @@ router.get('/login', (_, res) => {
  * parameter. Then, if all is good, redirect the user to the user page. If all
  * is not good, redirect the user to an error page
  */
+
 router.get('/callback', (req, res) => {
     const { code, state } = req.query;
     const storedState = req.cookies ? req.cookies[STATE_KEY] : null;
@@ -85,6 +87,7 @@ router.get('/callback', (req, res) => {
         });
     }
 });
+
 router.post('/devices', (req,res) => {
     const {access_token,name,refresh_token} = req.body;
     if(access_token) {
@@ -128,6 +131,7 @@ router.post('/devices', (req,res) => {
     }else
         res.json({msg : "access_token undefined"});
 });
+
 router.post('/search', (req, res, next) => {
     const {search,access_token,refresh_token,name}= req.body;
     logger.info("Searching for "+search)
@@ -157,8 +161,6 @@ router.post('/search', (req, res, next) => {
     }
     request(options, callback);
 });
-
-
 
 router.post('/song-queue', (req, res) => {
     if(req.body == null) res.sendStatus(400)

@@ -1,8 +1,8 @@
 const logger = require('../build/lib/logger')
 const url = require('url')
 const admin = require('firebase-admin');
-
-var jobs = require('./kueStart.js');
+const kue = require('kue')
+const jobs = kue.createQueue();
 
 const request = require('request');
 const refreshToken = require('./refreshToken.js')
@@ -50,10 +50,11 @@ jobs.process('song',1, function ( job, done ) {
     }
     request(options, callback);	
      //Store the job's done function in a global variable so we can access it from elsewhere.
-    
+    _exitActivJob = function() {
+        done();
+    };
 } );
 
-//Store the job's done function in a global variable so we can access it from elsewhere.
 
 
 module.exports = jobs;
