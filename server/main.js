@@ -18,16 +18,30 @@ const app = express()
 const admin = require('firebase-admin');
 const compiler = webpack(webpackConfig)
 
+const redis = require ('redis');
+const url = require('url')
+let redisUrl = url.parse(process.env.REDISCLOUD_URL||"127.0.0.1");
+const kue = require('kue');
+
+redisClient = redis.createClient(parseInt(redisUrl.port), redisUrl.hostname);
+if(redisUrl.auth)
+    redisClient.auth(redisUrl.auth.split(':')[1]);
+
+kue.redis.createClient = function () {
+    return redisClient;
+};
+
+
 
 // make sure we use the Heroku Redis To Go URL
 // (put REDISTOGO_URL=redis://localhost:6379 in .env for local testing)
 
 if (project.env === 'development') {
 
-    //const kueUiExpress = require('kue-ui-express');
-    //kueUiExpress(app, '/kue/', '/kue-api/');
-    //app.use('/kue-api/', kue.app);
-    //kue.createQueue();
+    const kueUiExpress = require('kue-ui-express');
+    kueUiExpress(app, '/kue/', '/kue-api/');
+    app.use('/kue-api/', kue.app);
+
     logger.info('Enabling webpack development and HMR middleware')
     app.use(
         require('webpack-dev-middleware')(compiler, {
@@ -73,18 +87,6 @@ if (project.env === 'development') {
     // server in production.
 }
 const info = require('../.auth.js');
-const redis = require ('redis');
-const url = require('url')
-let redisUrl = url.parse(process.env.REDISCLOUD_URL||"127.0.0.1");
-const kue = require('kue');
-
-redisClient = redis.createClient(parseInt(redisUrl.port), redisUrl.hostname);
-if(redisUrl.auth)
-    redisClient.auth(redisUrl.auth.split(':')[1]);
-
-kue.redis.createClient = function () {
-    return redisClient;
-};
 
 admin.initializeApp({
     credential: admin.credential.cert(info.firebase),

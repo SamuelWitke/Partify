@@ -16,7 +16,7 @@ import NotificationsIcon from 'material-ui/svg-icons/social/notifications';
 import ThumbUp from 'material-ui/svg-icons/action/thumb-up';
 import ThumbDown from 'material-ui/svg-icons/action/thumb-down';
 
-const SongItem = ({ author, active, disabled, song, visableDelete, id, votes, downVote, upVote, onDeleteClick }) => (
+const SongItem = ({ author, active, disabledUp, disabledDown, song, visableDelete, id, votes, downVote, upVote, onDeleteClick }) => (
     <GridTile
         key={id}
         title={
@@ -45,16 +45,16 @@ const SongItem = ({ author, active, disabled, song, visableDelete, id, votes, do
                     <Checkbox 
                         checkedIcon={<ThumbUp />}
                         uncheckedIcon={<ThumbUp />}
-                        disabled={disabled || active}
-                        checked={disabled || active}
+                        disabled={disabledUp || active}
+                        checked={disabledUp || active}
                         onCheck={() => upVote(song, song._key || id)}/>
                 </div>
                 <div style={{  float: 'right'}}> 
                     <Checkbox 
                         checkedIcon={<ThumbDown />}
                         uncheckedIcon={<ThumbDown />}
-                        disabled={disabled || active}
-                        checked={disabled || active}
+                        checked={disabledDown || active}
+                        disabled={disabledDown || active}
                         onCheck={() => downVote(song, song._key || id)}/>
                 </div>
             </div>

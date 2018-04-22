@@ -70,7 +70,8 @@ class Songs extends Component {
             songs.forEach( song => {
                 song.project = { 
                     name: name,
-                    votedBy: '',
+                    votedUpBy: '',
+                    votedDownBy: '',
                     votes: 0,
                     submitedBy: auth.uid,
                     author: profile.displayName || "Anonymous"

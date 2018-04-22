@@ -52,7 +52,7 @@ export default class SongsList extends Component {
         const {sendError, sendInfo, firebase, uid}= this.props;
         try{
             let refVote = firebase.database().ref(`projects/${this.props.name}/Songs/${id}/song/project/votes`)
-            let refBy = firebase.database().ref(`projects/${this.props.name}/Songs/${id}/song/project/votedBy/${uid}`).set(uid);
+            let refBy = firebase.database().ref(`projects/${this.props.name}/Songs/${id}/song/project/votedUpBy/${uid}`).set(uid);
             refVote.transaction( (votes) => {
                 return (votes || 0) + 1;
             });
@@ -67,23 +67,30 @@ export default class SongsList extends Component {
             })
         }
     }
-   
+
     downVote = (song,id) => {
         const {sendError, sendInfo,name,firebase, uid}= this.props;
         try{
             let refVote = firebase.database().ref(`projects/${name}/Songs/${id}/song/project/votes`)
-            let refBy = firebase.database().ref(`projects/${name}/Songs/${id}/song/project/votedBy/${uid}`).set(uid);
+            let refBy = firebase.database().ref(`projects/${name}/Songs/${id}/song/project/votedDownBy/${uid}`).set(uid);
             const votes = refVote.transaction( (votes) => {
                 return (votes || 0) - 1;
             });
             votes.then( data => {
-                if(data.snapshot.val() < 0)
-                firebase.database().ref(`projects/${name}/Songs/${id}/`).remove();
+                if(data.snapshot.val() < -1){
+                    firebase.database().ref(`projects/${name}/Songs/${id}/`).remove();
+                    sendInfo({
+                        title: song.name+" was removed due to low votes ",
+                        position: 'tr',
+                    })
+                }else{
+                    sendInfo({
+                        title: song.name+" Downvoted ",
+                        position: 'tr',
+                    })
+                }
+
             } )
-            sendInfo({
-                title: song.name+" Downvoted ",
-                position: 'tr',
-            })
         }catch( e ){
             sendError({
                 title: 'Error Upvoting',
@@ -96,11 +103,11 @@ export default class SongsList extends Component {
     onDelete = (song,id) => {
         const { sendInfo, firebase, name} = this.props;
         try{
-        let refVote = firebase.database().ref(`projects/${name}/Songs/${id}/`).remove();
-        sendInfo({
-            title: 'Song '+song.name+' Deleted',
-            position: 'tr',
-        })
+            let refVote = firebase.database().ref(`projects/${name}/Songs/${id}/`).remove();
+            sendInfo({
+                title: 'Song '+song.name+' Deleted',
+                position: 'tr',
+            })
         }catch( e ){
             sendError({
                 title: 'Error Deleting '+song,
@@ -121,45 +128,48 @@ export default class SongsList extends Component {
         const {songs,auth,uid,profile} = this.props 
         return(
             <Paper>
-                { songs != undefined || !isEmpty(songs) ? (
-                    <div className={classes.list}>
-                        <div style={styles.root}>
-                            <Subheader>Songs</Subheader>
-                            <GridList
-                                cols={1}
-                                padding={1}
-                                cellHeight={200}
-                                style={styles.gridList}
-                            >
-                                { map( songs, (song, id)  => {
-                                    const disabled = typeof song.song.project.votedBy == 'object' ? Object.keys(song.song.project.votedBy).map( key => key).includes(uid)  : false;
-                                    const visableDelete = song.song.project.submitedBy === uid
-                                    const active = song.song.active ? true : false;
-                                    const author = song.song.project.author;
-                                    // if(active && visableDelete) this.sendActiveMsg();
-                                    return (
-                                        <span key={id}>
-                                        <SongItem
-                                            author={ author }
-                                            disabled = {disabled}
-                                            song={song.song}
-                                            votes={song.song.project.votes}
-                                            active={active}
-                                            upVote={this.upVote}
-                                            downVote = { this.downVote }
-                                            visableDelete={visableDelete}
-                                            onDeleteClick = {this.onDelete}
-                                            id={id}
-                                        />
-                                    </span>
-                                )})}
-                            </GridList >
-                    </div>
+            { songs != undefined || !isEmpty(songs) ? (
+                <div className={classes.list}>
+                <div style={styles.root}>
+                <Subheader>Songs</Subheader>
+                <GridList
+                    cols={1}
+                    padding={1}
+                    cellHeight={200}
+                    style={styles.gridList}
+                >
+                    { map( songs, (song, id)  => {
+                        const disabledUp = typeof song.song.project.votedUpBy == 'object' ? Object.keys(song.song.project.votedUpBy).map( key => key).includes(uid)  : false;
+                        const disabledDown = typeof song.song.project.votedDownBy == 'object' ? Object.keys(song.song.project.votedDownBy).map( key => key).includes(uid)  : false;
+                        const visableDelete = song.song.project.submitedBy === uid
+                        const active = song.song.active ? true : false;
+                        const author = song.song.project.author;
+                        console.log(disabledDown)
+                        // if(active && visableDelete) this.sendActiveMsg();
+                        return (
+                            <span key={id}>
+                            <SongItem
+                                author={ author }
+                                disabledUp = {disabledUp}
+                                disabledDown = {disabledDown}
+                                song={song.song}
+                                votes={song.song.project.votes}
+                                active={active}
+                                upVote={this.upVote}
+                                downVote = { this.downVote }
+                                visableDelete={visableDelete}
+                                onDeleteClick = {this.onDelete}
+                                id={id}
+                            />
+                            </span>
+                        )})}
+                    </GridList >
                 </div>
+            </div>
             ) : (
                 <div className={classes.empty}>Song Queue Empty</div>
             )}
             </Paper>
-        )
+    )
     }
 }
