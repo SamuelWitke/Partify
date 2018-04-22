@@ -17,7 +17,6 @@ module.exports = {
 	    databaseURL: "https://partypeople-b736d.firebaseio.com",
 	    projectId: "partypeople-b736d",
 	    storageBucket: "partypeople-b736d.appspot.com",
-	    messagingSenderId: "958613424454"
     }
 }
 console.log(process.env.apiKey)
