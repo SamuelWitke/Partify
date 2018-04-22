@@ -6,5 +6,5 @@
 **/node_modules
 coverage
 .env
-*/*.config
+./src/.config.js
 .redis-labs.js
