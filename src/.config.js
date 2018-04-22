@@ -8,6 +8,7 @@
  */
 
 export const env = 'development'
+console.log(process.env.projectId)
 
 // Config from Firebase Console
 export const firebase = {
