@@ -8,12 +8,13 @@
  */
 
 export const env = 'development'
-
+console.log(process.env.apiKey === "AIzaSyC9z35c77dSgRsqSVh_fLsCBsR3kV_21Y8")
 // Config from Firebase Console
 export const firebase = {
-	apiKey: process.env.apiKey, 
+	apiKey: "AIzaSyC9z35c77dSgRsqSVh_fLsCBsR3kV_21Y8", 
 	authDomain: `${process.env.projectId}.firebaseapp.com`,
 	databaseURL: `https://${process.env.projectId}.firebaseio.com`,
+    messagingSenderId: "958613424454"
 }
 
 // Config for react-redux-firebase
@@ -33,4 +34,4 @@ export const reduxFirebase = {
 	// profileDecorator: (userData) => ({ email: userData.email }) // customize format of user profile
 }
 
-export default { env,  reduxFirebase }
+export default { env, firebase,  reduxFirebase }
