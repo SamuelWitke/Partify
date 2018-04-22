@@ -1,0 +1,49 @@
+@import 'base';
+.container {
+  padding-right: 15%;
+  padding-left: 10%;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.img {
+    display:block;
+    margin:auto;
+}
+
+.title{
+    font-family: jaf-bernino-sans-condensed, helvetica, arial, sans-serif;
+    font-size: 1em;
+}
+.container {
+    overflow: hidden;
+}
+
+.badge {
+    display: inline-block;
+    padding: .25em .4em .4em .4em;
+    font-size: 75%;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: .25rem;
+    background-color: #0275d8;
+}
+@media (min-width: 768px) {
+  .container {
+    width: 750px;
+  }
+}
+@media (min-width: 992px) {
+  .container {
+    width: 970px;
+  }
+}
+@media (min-width: 1200px) {
+  .container {
+    width: 1170px;
+  }
+}

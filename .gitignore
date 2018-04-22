@@ -1,0 +1,10 @@
+*.log
+**/*.log
+.DS_Store
+**/.DS_Store
+**/dist
+**/node_modules
+coverage
+.env
+./src/.config.js
+.redis-labs.js

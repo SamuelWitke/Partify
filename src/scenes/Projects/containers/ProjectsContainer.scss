@@ -1,0 +1,26 @@
+@import 'base';
+
+.container {
+  @extend .flex-column-center;
+  justify-content: flex-start;
+  padding-top: 30px;
+  flex-grow: 2;
+  box-sizing: border-box;
+}
+
+.tiles {
+  @extend .flex-row-center;
+  -webkit-flex-flow: row wrap;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.progress {
+  @extend .flex-column-center;
+  justify-content: flex-start;
+  padding-top: 30px;
+  flex-grow: 2;
+  box-sizing: border-box;
+  padding-left: 5%;
+  padding-right: 5%;
+}
