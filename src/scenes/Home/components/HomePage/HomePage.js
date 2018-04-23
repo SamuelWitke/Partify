@@ -11,6 +11,8 @@ import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'mat
 import { firebaseConnect, populate } from 'react-redux-firebase'
 import { success, error, warning, info, removeAll } from 'react-notification-system-redux';
 import { setHost } from '../../../../store/host.js';
+import Paper from 'material-ui/Paper';
+
 
 const mapDispatchToProps = (dispatch)=> {
     return({
@@ -47,25 +49,26 @@ const enhance = compose(
                     message: 'Invalid Host Code',
                     position: 'tr',
                 });
-                console.error(e.message,e.stack)
+                console.error(e.message)
             }
         },
     })
 )
 
 const Home = ({ addNew, onSubmitFail }) => (
-    <Card className={classes.HomePage}>
-        <CardMedia  className={classes.container} overlay={<CardTitle title="Connect or Host" subtitle="A local Spotify Party" />} >
-            <img src={Party} className={classes.glitch}/>
-        </CardMedia>
-        <Connect
-            disabled={false}
-            onSubmit={addNew}
-        />
-        <CardText className={classes.info}>
-            They wanna hear it! Partify lets your guests control the music at home or wherever you are.
-        </CardText>
-    </Card>
+        <div className={classes.HomePage}>
+        <Card className={classes.card}>
+            <CardMedia  className={""} overlay={<CardTitle title="Connect or Host" subtitle="A local Spotify Party" />} >
+            </CardMedia>
+            <CardText className={classes.info}>
+                <Connect
+                    disabled={false}
+                    onSubmit={addNew}
+                />
+                They wanna hear it! Partify lets your guests control the music at home or wherever you are.
+            </CardText>
+        </Card>
+    </div>
 )
 
 Home.propTypes = {

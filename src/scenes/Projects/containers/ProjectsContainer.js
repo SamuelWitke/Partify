@@ -16,7 +16,14 @@ import NewProjectTile from '../components/NewProjectTile'
 import NewProjectDialog from '../components/NewProjectDialog'
 import classes from './ProjectsContainer.scss'
 import { push } from 'react-router-redux'
+import { error } from 'react-notification-system-redux';
 
+
+const mapDispatchToProps = (dispatch)=> {
+    return({
+        sendError: (errorObj) => dispatch(error(errorObj))
+    })
+}
 
 
 const populates = [{ child: 'createdBy', root: 'users' }]
@@ -33,7 +40,8 @@ const populates = [{ child: 'createdBy', root: 'users' }]
         auth,
         projects: populate(firebase, 'projects', populates),
         spotifyReducer
-    })
+    }),
+    mapDispatchToProps,
 )
 export default class Projects extends Component {
     static contextTypes = {
@@ -48,18 +56,6 @@ export default class Projects extends Component {
         auth: PropTypes.object
     }
 
-    componentWillUpdate(oldProps,oldState){
-        if(oldState.devices.length > 0 && this.state.devices.length > 0){
-            let val = false;
-            oldState.devices.forEach( (item,i) =>{
-                if(item.id !== this.state.devices[i].id)
-                    val = true;
-            })
-            if(val){
-                this.fetchDevices();
-            }
-        }
-    }
     fetchUser = ()=>{
         return new Promise((resolve, reject) => {
             this.props.firebase.auth().onAuthStateChanged(function (user) {
@@ -71,11 +67,13 @@ export default class Projects extends Component {
             })
         })
     }
+
     fetchDevices = async ()=>{
         const { firebase, auth, projects, dispatch, spotifyReducer} = this.props
         let user = await this.fetchUser()
         const accessRef = this.props.firebase.database().ref(`users/${user.uid}/accessToken`);
         const refreshToken = this.props.firebase.database().ref(`users/${user.uid}/refreshToken`);
+        
         const snapshotAccess = await accessRef.once('value');
         const snapshotRefresh = await refreshToken.once('value');
         const body = {
@@ -83,21 +81,24 @@ export default class Projects extends Component {
             access_token: snapshotAccess.val(), 
             refresh_token: snapshotRefresh.val(), 
         }
-        const response = await fetch('/devices',{
+        const response = fetch('/devices',{
             headers: {
                 'Accept': 'application/json, text/plain, ',
                 'Content-Type': 'application/json'
             },
             method: "POST",
             body: JSON.stringify(body)  
-        })
-        const data = await response.json();
-        if(data.devices != undefined){
-            this.setState({devices: data.devices})
-        }
+        }).then( response =>{
+            return response.json();
+        } ).then( data =>{
+            if(data.devices != undefined){
+                this.setState({devices: data.devices})
+            }
+        } )
     }
+
     componentWillMount(){
-        this.fetchDevices();
+       this.fetchDevices();
     }
 
     state = {
@@ -106,12 +107,23 @@ export default class Projects extends Component {
     }
 
     newSubmit = async newProject => {
-        const {auth,spotifyReducer} = this.props;
+        const {auth,spotifyReducer,sendError} = this.props;
+
+        if(newProject.device == undefined){
+            sendError({
+                    title: 'Error',
+                    message: 'Device not selected',
+                    position: 'tr',
+                });
+            throw new Error("Device not found")
+        }
+
         newProject['createdBy'] = auth.email;
         const accessRef = this.props.firebase.database().ref(`users/${auth.uid}/accessToken`);
         const refreshToken = this.props.firebase.database().ref(`users/${auth.uid}/refreshToken`);
         const snapshotAccess = await accessRef.once('value');
         const snapshotRefresh = await refreshToken.once('value');
+
         newProject['access_token'] = snapshotAccess.val();
         newProject['refresh_token'] = snapshotRefresh.val();
         return this.props.firebase
@@ -144,7 +156,7 @@ export default class Projects extends Component {
         if (!isLoaded(projects,auth)) {
             return <LoadingSpinner />
         }
-        if(devices.length == 0) {
+        if(devices.length === 0) {
             return (
                 <div className={classes.container}>
                     <h1> Open Spotify and Connect Some Devices </h1>        
@@ -156,6 +168,7 @@ export default class Projects extends Component {
         if (this.props.children) {
             return cloneElement(this.props.children, this.props)
         }
+
         return (
             <div className={classes.container}>
                 {newProjectModal && (

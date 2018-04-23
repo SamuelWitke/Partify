@@ -26,7 +26,7 @@ export const NewProjectDialog = ({
     devices
 }) => (
     <Dialog
-        title="New Project"
+        title="New Party"
         open={open}
         onRequestClose={onRequestClose}
         contentClassName={classes.container}
@@ -34,14 +34,15 @@ export const NewProjectDialog = ({
         <FlatButton label="Cancel" secondary onTouchTap={onRequestClose} />,
         <FlatButton label="Create" primary onTouchTap={submit} />
         ]}>
+        Make a host code for your guests to connect to.
         <form onSubmit={handleSubmit} className={classes.inputs}>
             <Field
                 name="name"
                 component={TextField}
-                floatingLabelText="Project Name"
+                floatingLabelText="Host Code"
                 validate={[required]}
             />
-        <h1> Device To Host On </h1>
+        <h2> Device To Host On </h2>
         <Field name="device" component={renderRadioGroup}>
             {devices && 
             devices.map( elm =>	 {
