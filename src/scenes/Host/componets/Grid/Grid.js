@@ -27,6 +27,8 @@ const Grid= ({tilesData, handleTouchTap}) => (
         padding={1}
     >
         {tilesData.map((tile) => (
+            <span 
+                key={tile.id}>  
             <GridTile
                 key={tile.name+tile.album.images[0].url}
                 title={tile.name}
@@ -40,6 +42,7 @@ const Grid= ({tilesData, handleTouchTap}) => (
             >
                 <img src={tile.album.images[0].url} />
             </GridTile>
+        </span>
         ))}
     </GridList>
 );
