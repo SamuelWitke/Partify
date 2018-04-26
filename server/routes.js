@@ -4,9 +4,10 @@ const express = require('express');
 const router = new express.Router();
 const logger = require('../build/lib/logger')
 const admin = require('firebase-admin');
-const jobs = require('./kue.js');
 const request = require('request');
 const refreshToken = require('./refreshToken.js')
+
+const jobs = require('./kue.js');
 
 
 // configure the express server
@@ -162,14 +163,17 @@ router.post('/search', (req, res, next) => {
     request(options, callback);
 });
 
-
 router.post('/song-queue', (req, res) => {
     if(req.body == null) res.sendStatus(400)
     const {songs,access_token,device,refresh_token,name}= req.body;
     let song = songs[0];
     let key = undefined;
+    //const Project = require('./kue.js');
+    //const project = new Project(song.project.name);
+    //const jobs = project.jobsQueue;
+
     songs.forEach( song => {
-        var songJob = jobs.create( 'song', {
+        var songJob = jobs.create(song.project.name, {
             title: song.name,
             project: song.project.name,
             time: song.duration_ms,
@@ -177,7 +181,6 @@ router.post('/song-queue', (req, res) => {
             access_token: access_token,
             refresh_token: refresh_token,
             device: device,
-            bar: function () { console.log('secret'); },
             key: admin.database().ref(`projects/${song.project.name}/Songs`).push({song}).key,
         })
             .priority(song.project.votes)
@@ -191,6 +194,8 @@ router.post('/song-queue', (req, res) => {
                 }
             })
     });
+    
+
     });
 
 module.exports = router;
