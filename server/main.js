@@ -17,13 +17,7 @@ const bodyParser = require('body-parser');
 const app = express()
 const admin = require('firebase-admin');
 const compiler = webpack(webpackConfig)
-
-const {jobs, kue} = require('./kue.js');
-
-
-
-// make sure we use the Heroku Redis To Go URL
-// (put REDISTOGO_URL=redis://localhost:6379 in .env for local testing)
+const  kue = require('./kue.js');
 
 if (project.env === 'development') {
 
@@ -58,9 +52,6 @@ if (project.env === 'development') {
     // when the application is compiled.
     app.use(express.static(path.resolve(project.basePath, 'public')))
 
-    // This rewrites all routes requests to the root /index.html file
-    // (ignoring file requests). If you want to implement universal
-    // rendering, you'll want to remove this middleware.
 
 } else {
     logger.warn(
@@ -75,8 +66,8 @@ if (project.env === 'development') {
     // the web server and not the app server, but this helps to demo the
     // server in production.
 }
+
 const info = require('../.auth.js');
-const jobs = require('./kue.js');
 const request = require('request');
 
 admin.initializeApp({
@@ -84,9 +75,15 @@ admin.initializeApp({
     databaseURL: "https://partypeople-b736d.firebaseio.com"
 });
 
+
+
 admin.database().ref('/projects').on("child_added", function(snapshot) {
-    var project = snapshot.val();
-		jobs.process(project.name,1, ( job, done ) =>{
+    const projects = snapshot.val();
+    const jobs = kue.createQueue();
+    let _exitActivJob;
+    let playing = false;
+
+    jobs.process(projects.name,1,( job, done ) => {
         let access_token = `${job.data.access_token}`
         var headers = {
             'Accept': 'application/json',
@@ -102,11 +99,19 @@ admin.database().ref('/projects').on("child_added", function(snapshot) {
             headers: headers,
             body:  dataString
         };
-        function callback(error, response, body) {
-            if (!error) {
+
+        request(options, (error, response, body) => {
+            if (!error && !playing) {
+                playing = true;
                 logger.info("Playing",job.data.title);
                 admin.database().ref(`projects/${job.data.project}/Songs/${job.data.key}/song/active`).set(true)
-                setTimeout( function () {
+
+                //Store the job's done function in a global variable so we can access it from elsewhere.
+                _exitActivJob = () => {
+                    done();
+                };
+
+                setTimeout( () => {
                     let del_ref = admin.database().ref(`projects/${job.data.project}/Songs/${job.data.key}`);
                     del_ref.remove()
                         .then(function() {
@@ -115,73 +120,18 @@ admin.database().ref('/projects').on("child_added", function(snapshot) {
                         .catch(function(error) {
                             console.log('Error deleting data:', error);
                         });
+                    playing = false;
                     done();
-                res.sendStatus(200);
                 }, job.data.time);
-            }else {
-                logger.error(msg.error.message)
-                if(msg.error.message === 'The access token expired'){
-                    refreshToken(refresh_token,name);
-                }
-            }
-
-        }
-        request(options, callback);	
-        //Store the job's done function in a global variable so we can access it from elsewhere.
-        _exitActivJob = function() {
-            done();
-        };
-    } );
-
-	/*
-    let ref = admin.database().ref(`/projects/${newPost.name}/Songs`)
-
-    jobs.process(newPost.name,1, function ( job, done ) {
-            let access_token = `${job.data.access_token}`
-            var headers = {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer '+access_token,
-            };
-
-            var dataString = `{"uris":["${job.data.uri}"]}`;
-            var device = job.data.device;
-            var options = {
-                url: `https://api.spotify.com/v1/me/player/play?device_id=${device}`,
-                method: 'PUT',
-                headers: headers,
-                body:  dataString
-            };
-            function callback(error, response, body) {
-                if (!error) {
-                    logger.info("Playing",job.data.title);
-                    admin.database().ref(`projects/${job.data.project}/Songs/${job.data.key}/song/active`).set(true)
-                    setTimeout( function () {
-                        let del_ref = admin.database().ref(`projects/${job.data.project}/Songs/${job.data.key}`);
-                        del_ref.remove()
-                            .then(function() {
-                                logger.info('song removed');
-                            })
-                            .catch(function(error) {
-                                console.log('Error deleting data:', error);
-                            });
-                        done();
-                    }, job.data.time);
-                }else {
-                    logger.error(msg.error.message)
-                    if(msg.error.message === 'The access token expired'){
-                        refreshToken(refresh_token,name);
-                    }
-                }
-
-            }
-            request(options, callback);	
-            //Store the job's done function in a global variable so we can access it from elsewhere.
-            _exitActivJob = function() {
+            } else {
+                if( error ){ logger.error(error.message) }
+                else{ console.log("Error") }
                 done();
-            };
-        } );
+            }
+        })
+    });
 
+    let ref = admin.database().ref(`/projects/${projects.name}/Songs`)
     ref.on("child_changed", function(snapshot) {
         let song = snapshot.val()
         kue.Job.get( song.song.song_id, function( err, job ) {
@@ -197,6 +147,7 @@ admin.database().ref('/projects').on("child_added", function(snapshot) {
 
         });
     })
+
     ref.on("child_removed", function(snapshot) {
         let song = snapshot.val()
         logger.info("Song",song.song.name,"removed",song.song.song_id)
@@ -204,19 +155,19 @@ admin.database().ref('/projects').on("child_added", function(snapshot) {
             kue.Job.get(song.song.song_id, function( err, job ) {
                 if(!err){
                     try{
-                    job.state('active');
-                    job.remove();
-                    logger.info("Song",song.song.name,"removed")
+                        if(job.state('active') && song.song.active && _exitActivJob){
+                            _exitActivJob();
+                            playing = false;
+                        }
+                        job.remove();
+                        logger.info("Song",song.song.name,"removed")
                     }catch(e){
-                      logger.error(e.message)
+                        logger.error(e.message)
                     }
-            }
-        })
-        }catch(e){
-            logger.error(e.message)
-        }
+                }
+            })
+        } catch(e){logger.error(e.message)}
     })
-		*/
 });
 
 

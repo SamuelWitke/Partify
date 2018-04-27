@@ -7,7 +7,7 @@ const admin = require('firebase-admin');
 const request = require('request');
 const refreshToken = require('./refreshToken.js')
 
-const jobs = require('./kue.js');
+const kue = require('./kue.js');
 
 
 // configure the express server
@@ -123,7 +123,7 @@ router.post('/devices', (req,res) => {
 							var access_token = body.access_token;
 							try{
 									const snap = await admin.database().ref(`/users/${name}/accessToken`).set(access_token);
-									logger.success('Request Completed',snap.val())
+									logger.success('Request Completed',snap)
 									res.sendStatus(204)
 								}catch(e){
 									console.log(e, e.message);
@@ -169,10 +169,9 @@ router.post('/search', (req, res, next) => {
 router.post('/song-queue', (req, res) => {
 	if(req.body == null) res.sendStatus(400)
 	const {songs,access_token,device,refresh_token,name}= req.body;
-	let song = songs[0];
-	let key = undefined;
+    const jobs = kue.createQueue();
 	songs.forEach( song => {
-		var songJob = jobs.create( 'song', {
+		var songJob = jobs.create(song.project.name,{
 			title: song.name,
 			project: song.project.name,
 			time: song.duration_ms,
@@ -183,16 +182,17 @@ router.post('/song-queue', (req, res) => {
 			key: admin.database().ref(`projects/${song.project.name}/Songs`).push({song}).key,
 			})
 		.priority(song.project.votes)
-		.save( err =>{
-			if(err){
-				logger.error(err.msg);
-				res.json(err.msg)
-				}else {
+		.save( err => {
+            if(err) { 
+                logger.error(err.msg); 
+                res.json(err.msg)
+            } else {
 					song.song_id = songJob.id;
 					admin.database().ref(`projects/${song.project.name}/Songs/${songJob.data.key}/song/song_id`).set(songJob.id)
-					}
-			})
+				}
+	    })
 	});
+    res.sendStatus(204)
 });
 
 module.exports = router;

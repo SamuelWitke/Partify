@@ -33,8 +33,7 @@ module.exports = jobs = kue.createQueue(kueOptions);
 =======
 const jobs = kue.createQueue(kueOptions);
 */
-const jobs = kue.createQueue();
 
 
-module.exports = {jobs,kue};
+module.exports = kue;
 
