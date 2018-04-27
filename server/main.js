@@ -79,9 +79,20 @@ admin.initializeApp({
 
 admin.database().ref('/projects').on("child_added", function(snapshot) {
     const projects = snapshot.val();
-    const jobs = kue.createQueue();
     let _exitActivJob;
     let playing = false;
+
+    const kueOptions = {};
+    if(process.env.REDISCLOUD_URL) {
+    kueOptions.redis = {
+        port: parseInt(redisUrl.port),
+        host: redisUrl.hostname
+    };
+    if(redisUrl.auth) {
+        kueOptions.redis.auth = redisUrl.auth.split(':')[1];
+    }
+    }
+    const jobs = kue.createQueue(kueOptions);
 
     jobs.process(projects.name,1,( job, done ) => {
         let access_token = `${job.data.access_token}`

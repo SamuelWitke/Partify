@@ -169,7 +169,18 @@ router.post('/search', (req, res, next) => {
 router.post('/song-queue', (req, res) => {
 	if(req.body == null) res.sendStatus(400)
 	const {songs,access_token,device,refresh_token,name}= req.body;
-    const jobs = kue.createQueue();
+    const kueOptions = {};
+    if(process.env.REDISCLOUD_URL) {
+    kueOptions.redis = {
+        port: parseInt(redisUrl.port),
+        host: redisUrl.hostname
+    };
+    if(redisUrl.auth) {
+        kueOptions.redis.auth = redisUrl.auth.split(':')[1];
+    }
+    }
+    const jobs = kue.createQueue(kueOptions);
+
 	songs.forEach( song => {
 		var songJob = jobs.create(song.project.name,{
 			title: song.name,
