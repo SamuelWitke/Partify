@@ -81,7 +81,6 @@ admin.initializeApp({
 admin.database().ref('/projects').on("child_added", function(snapshot) {
     const projects = snapshot.val();
     let _exitActivJob;
-    let playing = false;
 
     const kueOptions = {};
     let redisUrl = url.parse(process.env.REDISCLOUD_URL||"redis://localhost:6379");
@@ -96,7 +95,7 @@ admin.database().ref('/projects').on("child_added", function(snapshot) {
     }
     const jobs = kue.createQueue(kueOptions);
 
-    jobs.process(projects.name,1,( job, done ) => {
+    jobs.process(projects.name.trim().toUpperCase(),1,( job, done ) => {
         let access_token = `${job.data.access_token}`
         var headers = {
             'Accept': 'application/json',
@@ -113,41 +112,35 @@ admin.database().ref('/projects').on("child_added", function(snapshot) {
             body:  dataString
         };
 
-        request(options, (error, response, body) => {
-            if (!error && !playing) {
-                playing = true;
+        request(options, async (error, response, body) => {
+            if (!error) {
                 logger.info("Playing",job.data.title);
-                admin.database().ref(`projects/${job.data.project}/Songs/${job.data.key}/song/active`).set(true)
-
+                await admin.database().ref(`projects/${job.data.project}/Songs/${job.data.key}/song/active`).set(true)
                 //Store the job's done function in a global variable so we can access it from elsewhere.
                 _exitActivJob = () => {
                     done();
                 };
-
-                setTimeout( () => {
+                setTimeout( async () => {
                     let del_ref = admin.database().ref(`projects/${job.data.project}/Songs/${job.data.key}`);
-                    del_ref.remove()
-                        .then(function() {
-                            logger.info('song removed');
-                        })
-                        .catch(function(error) {
-                            console.log('Error deleting data:', error);
-                        });
-                    playing = false;
+                    try{
+                       await del_ref.remove()
+                       logger.info('song removed');
+                    }catch( error ){
+                        console.log('Error deleting data:', error);
+                    };
                     done();
                 }, job.data.time);
             } else {
-                if( error ){ logger.error(error.message) }
-                else{ console.log("Error") }
+                logger.error(error.message) 
                 done();
             }
         })
     });
 
     let ref = admin.database().ref(`/projects/${projects.name}/Songs`)
-    ref.on("child_changed", function(snapshot) {
+    ref.on("child_changed", (snapshot) => {
         let song = snapshot.val()
-        kue.Job.get( song.song.song_id, function( err, job ) {
+        kue.Job.get( song.song.song_id, ( err, job ) => {
             try{
                 job.priority(-song.song.project.votes).update(() => {
                     if(!err){
@@ -170,7 +163,6 @@ admin.database().ref('/projects').on("child_added", function(snapshot) {
                     try{
                         if(job.state('active') && song.song.active && _exitActivJob){
                             _exitActivJob();
-                            playing = false;
                         }
                         job.remove();
                         logger.info("Song",song.song.name,"removed")
