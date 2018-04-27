@@ -170,6 +170,7 @@ router.post('/song-queue', (req, res) => {
 	if(req.body == null) res.sendStatus(400)
 	const {songs,access_token,device,refresh_token,name}= req.body;
     const kueOptions = {};
+    let redisUrl = url.parse(process.env.REDISCLOUD_URL||"redis://localhost:6379");
     if(process.env.REDISCLOUD_URL) {
     kueOptions.redis = {
         port: parseInt(redisUrl.port),

@@ -83,6 +83,7 @@ admin.database().ref('/projects').on("child_added", function(snapshot) {
     let playing = false;
 
     const kueOptions = {};
+    let redisUrl = url.parse(process.env.REDISCLOUD_URL||"redis://localhost:6379");
     if(process.env.REDISCLOUD_URL) {
     kueOptions.redis = {
         port: parseInt(redisUrl.port),
