@@ -5,8 +5,7 @@ const router = new express.Router();
 const logger = require('../build/lib/logger')
 const admin = require('firebase-admin');
 const request = require('request');
-const refreshToken = require('./refreshToken.js')
-
+const url = require('url')
 const kue = require('./kue.js');
 
 
