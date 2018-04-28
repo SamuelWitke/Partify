@@ -78,10 +78,11 @@ admin.initializeApp({
 });
 
 const request = require('request');
+let _exitActivJob;
 
-admin.database().ref('/projects').on("child_added", function(snapshot) {
-    const projects = snapshot.val();
-    let _exitActivJob;
+admin.database().ref('/kues').on("child_added", function(snapshot) {
+   const projects = snapshot.val();
+    console.log(projects)
 
     const kueOptions = {};
     let redisUrl = url.parse(process.env.REDISCLOUD_URL||"redis://localhost:6379");
@@ -96,9 +97,9 @@ admin.database().ref('/projects').on("child_added", function(snapshot) {
     }
 
     const jobs = kue.createQueue(kueOptions);
-    if(projects.name){
-        console.log("processing",projects.name)
-        jobs.process(projects.name,1,( job, done ) => {
+    if(projects){
+        console.log("processing",projects)
+        jobs.process(projects,1,( job, done ) => {
         const playerProcess = new Promise((resolve, reject) => {
         let access_token = `${job.data.access_token}`
         var headers = {
@@ -147,8 +148,11 @@ admin.database().ref('/projects').on("child_added", function(snapshot) {
             //player(job,done,_exitActivJob).then( res => logger.success(res) )
         });
     }
+})
 
-    let ref = admin.database().ref(`/projects/${projects.name}/Songs`)
+admin.database().ref('/projects').on("child_added", function(snapshot) {
+   const projects = snapshot.val();
+     let ref = admin.database().ref(`/projects/${projects.name}/Songs`)
     ref.on("child_changed", (snapshot) => {
         let song = snapshot.val()
         kue.Job.get( song.song.song_id, ( err, job ) => {

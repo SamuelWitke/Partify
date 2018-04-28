@@ -147,8 +147,8 @@ router.post('/search', (req, res, next) => {
             }
         }catch (e){
             refreshToken(refresh_token,name,false)
-                    .then( res => logger.info(res))
-                    .catch( e=>{ logger.error(e) });
+                .then( res => logger.info(res))
+                .catch( e=>{ logger.error(e) });
             res.json(e.msg)
         }
     })
@@ -196,11 +196,39 @@ router.post('/song-queue', (req, res) => {
     res.sendStatus(204)
 });
 
-const player = require('./player.js')
-router.post('/playlist', (req, res) => {
-   if(req.body == null) res.sendStatus(400)
-   const {songs,access_token,device,uri,refresh_token,name}= req.body;
-    player() 
+router.post('/user-playlist', (req, res) => {
+    if(req.body == null) res.sendStatus(400)
+    const {songs,access_token,device,uri,refresh_token,user}= req.body;
+    const headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer '+access_token
+    };
+
+    var options = {
+        url: `https://api.spotify.com/v1/users/${user}/playlists?limit=20`,
+        headers: headers
+    };
+
+    request(options, async (error, response, body) => {
+        try { 
+            let msg = JSON.parse(body)
+            if (!msg.error) {
+                res.json(msg);
+            } else {
+                logger.error(msg.error.message)
+                refreshToken(refresh_token,name,false)
+                    .then( res => logger.info(res))
+                    .catch( e=>{ logger.error(e) });
+                res.send(msg.error.message)
+            }
+        }catch (e){
+            refreshToken(refresh_token,name,false)
+                .then( res => logger.info(res))
+                .catch( e=>{ logger.error(e) });
+            res.json(e.msg)
+        }
+    })
 })
 
 module.exports = router;

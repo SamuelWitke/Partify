@@ -20,6 +20,7 @@ import { error } from 'react-notification-system-redux';
 
 const mapDispatchToProps = (dispatch)=> {
     return({
+        changeLocation: (loc) => dispatch(push(loc)),
         sendError: (errorObj) => dispatch(error(errorObj))
     })
 }
@@ -121,7 +122,7 @@ export default class Projects extends Component {
     }
 
     newSubmit = async newProject => {
-        const {auth,spotifyReducer,sendError} = this.props;
+        const {firebase,auth,spotifyReducer,sendError} = this.props;
 
         if(newProject.device == undefined){
             sendError({
@@ -133,22 +134,28 @@ export default class Projects extends Component {
         }
 
         newProject['createdBy'] = auth.email;
-        const accessRef = this.props.firebase.database().ref(`users/${auth.uid}/accessToken`);
-        const refreshToken = this.props.firebase.database().ref(`users/${auth.uid}/refreshToken`);
+        const accessRef = firebase.database().ref(`users/${auth.uid}/accessToken`);
+        const refreshToken = firebase.database().ref(`users/${auth.uid}/refreshToken`);
         const snapshotAccess = await accessRef.once('value');
         const snapshotRefresh = await refreshToken.once('value');
 
         newProject['access_token'] = snapshotAccess.val();
         newProject['refresh_token'] = snapshotRefresh.val();
-        return this.props.firebase
+        
+        firebase
             .set(`projects/${newProject.name}`,newProject)
             .then(() => this.setState({ newProjectModal: false }))
             .catch(err => {
                 console.error('error creating new project', err) // eslint-disable-line
             })
+        await firebase.set(`kues/${newProject.name}`,newProject.name);
     }
 
-    deleteProject = key => this.props.firebase.remove(`projects/${key}`)
+    deleteProject = key => {
+        const { firebase } = this.props;
+        firebase.remove(`projects/${key}`)
+        firebase.remove(`kues/${key}`)
+    }
 
     toggleModal = (name, project) => {
         let newState = {}
@@ -165,7 +172,7 @@ export default class Projects extends Component {
     }
 
     render() {
-        const { projects, auth, dispatch, spotifyReducer} = this.props
+        const { projects, auth, changeLocation, spotifyReducer} = this.props
         const { newProjectModal, devices, loading } = this.state
         if (loading || !isLoaded(projects,auth)) {
             return <LoadingSpinner />
@@ -202,7 +209,7 @@ export default class Projects extends Component {
                                     project={project}
                                     onCollabClick={this.collabClick}
                                     onDelete={() => this.deleteProject(key)}
-                                    onSelect={() => dispatch(push(`${LIST_PATH}/${key} `))}
+                                    onSelect={() => changeLocation(`${LIST_PATH}/${key} `)}
                                     showDelete={this.getDeleteVisible(key)}
                                         />
                                 }
