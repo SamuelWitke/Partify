@@ -18,13 +18,11 @@ import classes from './ProjectsContainer.scss'
 import { push } from 'react-router-redux'
 import { error } from 'react-notification-system-redux';
 
-
 const mapDispatchToProps = (dispatch)=> {
     return({
         sendError: (errorObj) => dispatch(error(errorObj))
     })
 }
-
 
 const populates = [{ child: 'createdBy', root: 'users' }]
 
@@ -69,11 +67,11 @@ export default class Projects extends Component {
     }
 
     fetchDevices = async ()=>{
-        const { firebase, auth, projects, dispatch, spotifyReducer} = this.props
+        const { sendError, firebase, auth, projects, dispatch, spotifyReducer} = this.props
         let user = await this.fetchUser()
         const accessRef = this.props.firebase.database().ref(`users/${user.uid}/accessToken`);
         const refreshToken = this.props.firebase.database().ref(`users/${user.uid}/refreshToken`);
-        
+
         const snapshotAccess = await accessRef.once('value');
         const snapshotRefresh = await refreshToken.once('value');
         const body = {
@@ -92,17 +90,33 @@ export default class Projects extends Component {
             return response.json();
         } ).then( data =>{
             if(data.devices != undefined){
-                this.setState({devices: data.devices})
+                this.setState({devices: data.devices, loading: false})
+            }else if(data.msg === "no devices"){
+                sendError({
+                    title: 'Error',
+                    message: 'No Devices Found',
+                    position: 'tr',
+                    autoDismiss: 0,
+                    action: {
+                        label: 'Try Again?',
+                        callback: () => {
+                            this.fetchDevices();
+                        }
+                    }
+                })
+                this.setState({loading: false})
             }
         } )
     }
 
     componentWillMount(){
-       this.fetchDevices();
+        this.fetchDevices();
     }
+
 
     state = {
         newProjectModal: false,
+        loading: true,
         devices : [],
     }
 
@@ -111,10 +125,10 @@ export default class Projects extends Component {
 
         if(newProject.device == undefined){
             sendError({
-                    title: 'Error',
-                    message: 'Device not selected',
-                    position: 'tr',
-                });
+                title: 'Error',
+                message: 'Device not selected',
+                position: 'tr',
+            });
             throw new Error("Device not found")
         }
 
@@ -152,23 +166,21 @@ export default class Projects extends Component {
 
     render() {
         const { projects, auth, dispatch, spotifyReducer} = this.props
-        const { newProjectModal, devices } = this.state
-        if (!isLoaded(projects,auth)) {
+        const { newProjectModal, devices, loading } = this.state
+        if (loading || !isLoaded(projects,auth)) {
             return <LoadingSpinner />
         }
         if(devices.length === 0) {
             return (
                 <div className={classes.container}>
                     <h1> Open Spotify and Connect Some Devices </h1>        
-                        <LoadingSpinner />
+                    <LoadingSpinner />
                 </div>
             )
         }
-
         if (this.props.children) {
             return cloneElement(this.props.children, this.props)
         }
-
         return (
             <div className={classes.container}>
                 {newProjectModal && (
@@ -179,22 +191,22 @@ export default class Projects extends Component {
                         onRequestClose={() => this.toggleModal('newProject')}
                     />
                 )}
-                <div className={classes.tiles}>
-                    <NewProjectTile onClick={() => this.toggleModal('newProject')} />
-                    {!isEmpty(projects) && 
-                    map(projects, (project, key) => (
-                        <div>
-                            { auth.email === project.createdBy &&   
-                            <ProjectTile
-                                key={`${key}-Collab-${key}`}
-                                project={project}
-                                onCollabClick={this.collabClick}
-                                onDelete={() => this.deleteProject(key)}
-                                onSelect={() => dispatch(push(`${LIST_PATH}/${key} `))}
-                                showDelete={this.getDeleteVisible(key)}
-                            />
-                            }
-                        </div>
+            <div className={classes.tiles}>
+                <NewProjectTile onClick={() => this.toggleModal('newProject')} />
+                {!isEmpty(projects) && 
+                        map(projects, (project, key) => (
+                            <div>
+                                { auth.email === project.createdBy &&   
+                                <ProjectTile
+                                    key={`${key}-Collab-${key}`}
+                                    project={project}
+                                    onCollabClick={this.collabClick}
+                                    onDelete={() => this.deleteProject(key)}
+                                    onSelect={() => dispatch(push(`${LIST_PATH}/${key} `))}
+                                    showDelete={this.getDeleteVisible(key)}
+                                        />
+                                }
+                            </div>
                     ))}
                 </div>
             </div>

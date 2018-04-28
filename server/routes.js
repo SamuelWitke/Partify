@@ -7,6 +7,7 @@ const admin = require('firebase-admin');
 const request = require('request');
 const url = require('url')
 const kue = require('./kue.js');
+const refreshToken = require('./refreshToken.js')
 
 
 // configure the express server
@@ -107,29 +108,15 @@ router.post('/devices', (req,res) => {
                 });
                 res.json({devices});
             }else if(body.error != undefined && body.error.message == 'The access token expired'){
-                authOptions = {
-                    url: 'https://accounts.spotify.com/api/token',
-                    headers: { 'Authorization': 'Basic ' + (new Buffer(process.env.SPOTIFYCLIENT+ ':' + process.env.SPOTIFYSECRET).toString('base64')) },
-                    form: {
-                        grant_type: 'refresh_token',
-                        refresh_token: refresh_token
-                    },
-                    json: true
-                };
-                request.post(authOptions, async (error, response, body) => {
-                    if (!error && response.statusCode === 200) {
-                        var access_token = body.access_token;
-                        try{
-                            const snap = await admin.database().ref(`/users/${name}/accessToken`).set(access_token);
-                            logger.success('Request Completed',snap)
-                            res.sendStatus(204)
-                        }catch(e){
-                            console.log(e, e.message);
-                        }
-                    }
-                });
-            }else 
+                refreshToken(refresh_token,name,true)
+                    .then( res => logger.info(res))
+                    .catch( e=>{ logger.error(e) });
+            }else{
+                refreshToken(refresh_token,name,true)
+                    .then( res => logger.info(res))
+                    .catch( e=>{ logger.error(e) });
                 res.json( {msg : "no devices"});
+            }
         });
     }else
         res.json({msg : "access_token undefined"});
@@ -153,12 +140,15 @@ router.post('/search', (req, res, next) => {
                 res.json(msg);
             } else {
                 logger.error(msg.error.message)
-                if(msg.error.message === 'The access token expired'){
-                    refreshToken(refresh_token,name);
-                }
+                refreshToken(refresh_token,name,false)
+                    .then( res => logger.info(res))
+                    .catch( e=>{ logger.error(e) });
                 res.send(msg.error.message)
             }
         }catch (e){
+            refreshToken(refresh_token,name,false)
+                    .then( res => logger.info(res))
+                    .catch( e=>{ logger.error(e) });
             res.json(e.msg)
         }
     })
@@ -181,7 +171,8 @@ router.post('/song-queue', (req, res) => {
     const jobs = kue.createQueue(kueOptions);
 
     songs.forEach( song => {
-        var songJob = jobs.create(song.project.name.trim().toUpperCase(),{
+        logger.info("Adding ",song.name," To ",song.project.name)
+        var songJob = jobs.create(song.project.name,{
             title: song.name,
             project: song.project.name,
             time: song.duration_ms,

@@ -1,26 +1,33 @@
 const logger = require('../build/lib/logger')
 const request = require('request');
 const admin = require('firebase-admin');
-const refreshToken = (refresh_token,name) => {
-    logger.info("Requesting refresh_token",refresh_token,name)
-    // requesting access token from refresh token
-    var authOptions = {
-        url: 'https://accounts.spotify.com/api/token',
-        headers: { 'Authorization': 'Basic ' + (new Buffer(process.env.SPOTIFYCLIENT+ ':' + process.env.SPOTIFYSECRET).toString('base64')) },
-        form: {
-            grant_type: 'refresh_token',
-            refresh_token: refresh_token
-        },
-        json: true
-    };
+const refreshToken = (refresh_token,name,device) => {
+    return new Promise((resolve, reject) =>  {
+        logger.info("Requesting refresh_token",name)
+        // requesting access token from refresh token
+        var authOptions = {
+            url: 'https://accounts.spotify.com/api/token',
+            headers: { 'Authorization': 'Basic ' + (new Buffer(process.env.SPOTIFYCLIENT+ ':' + process.env.SPOTIFYSECRET).toString('base64')) },
+            form: {
+                grant_type: 'refresh_token',
+                refresh_token: refresh_token
+            },
+            json: true
+        };
 
-    request.post(authOptions, function(error, response, body) {
-        if (!error && response.statusCode === 200) {
-            var access_token = body.access_token;
-            logger.success('Request Completed',name)
-            admin.database().ref(`/projects/${name}/access_token`).set(access_token)
-        }
-    });
+        request.post(authOptions, async (error, response, body) => {
+            if (!error && response.statusCode === 200) {
+                var access_token = body.access_token;
+                if( device )
+                    await admin.database().ref(`/users/${name}/accessToken`).set(access_token);
+                else 
+                    await admin.database().ref(`/projects/${name}/access_token`).set(access_token)
+                resolve("Request Completed!");
+            }else{
+                reject()
+            }
+        });
+    })
 };
 
 module.exports = refreshToken;

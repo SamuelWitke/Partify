@@ -12,4 +12,3 @@ kue.redis.createClient = function () {
 };
 
 module.exports = kue;
-
