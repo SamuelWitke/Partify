@@ -196,4 +196,11 @@ router.post('/song-queue', (req, res) => {
     res.sendStatus(204)
 });
 
+const player = require('./player.js')
+router.post('/playlist', (req, res) => {
+   if(req.body == null) res.sendStatus(400)
+   const {songs,access_token,device,uri,refresh_token,name}= req.body;
+    player() 
+})
+
 module.exports = router;

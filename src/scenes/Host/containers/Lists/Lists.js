@@ -123,7 +123,8 @@ export default class Lists extends Component {
 
 
     render() {
-        const {project,params,uid} = this.props;
+
+        const {project,params,uid,profile} = this.props;
         const songs = project ? project.Songs: null;
         return (
             <div> 
@@ -133,7 +134,7 @@ export default class Lists extends Component {
                         onDelete={this.onDelete}
                         upVote={this.upVote}
                         downVote={this.downVote}
-                        admin={project.createdBy}
+                        admin={project.createdBy === profile.email}
                         name={params.name} 
                         songs={songs} /> 
                 ) : (
