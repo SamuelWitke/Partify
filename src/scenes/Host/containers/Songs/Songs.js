@@ -14,6 +14,14 @@ import SearchBar from 'material-ui-search-bar';
 import {push} from 'react-router-redux'
 
 const populates = [{ child: 'createdBy', root: 'users' }]
+ const mapDispatchToProps = (dispatch)=> {
+ return({
+    changeLocation: (loc) => dispatch(push(loc)),
+    sendError: (errorObj) => dispatch(error(errorObj)),
+    sendInfo: (infoObj) => dispatch(info(infoObj)),
+ })
+ }
+
 
 const fixedbutton = {
     position: 'fixed',
@@ -32,7 +40,7 @@ const fixedbutton = {
         params: params
     }))
 
-class Songs extends Component {
+export default class Songs extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -64,7 +72,7 @@ class Songs extends Component {
     }
     submitSongs = async props => {
         const {name} = this.props.params;
-        const {auth, profile} = this.props;
+        const {sendError,changeLocation, auth, profile, firebase,sendInfo} = this.props;
         const {songs} = this.state;
         if(songs.length > 0){
             songs.forEach( song => {
@@ -77,9 +85,9 @@ class Songs extends Component {
                     author: profile.displayName || "Anonymous"
                 }
             });
-            const accessRef = this.props.firebase.database().ref(`projects/${name}/access_token`);
-            const refreshRef = this.props.firebase.database().ref(`projects/${name}/refresh_token`);
-            const deviceRef = this.props.firebase.database().ref(`projects/${name}/device`);
+            const accessRef = firebase.database().ref(`projects/${name}/access_token`);
+            const refreshRef = firebase.database().ref(`projects/${name}/refresh_token`);
+            const deviceRef = firebase.database().ref(`projects/${name}/device`);
             const snapshotAccess = await accessRef.once('value');
             const snapshotRefresh = await refreshRef.once('value');
             const device = await deviceRef.once('value');
@@ -106,7 +114,7 @@ class Songs extends Component {
                             message: 'Vote it up to play next',
                             position: 'tr',
                         };
-                        this.props.dispatch(info(notificationOpts))
+                        sendInfo(notificationOpts)
                     }
                 })
                 .catch( err => {
@@ -116,14 +124,14 @@ class Songs extends Component {
                         position: 'tr',
                     }))
                 } )
-            this.props.dispatch(push(`Host/Party/${name}`)) 
+            changeLocation(`Host/Party/${name}`) 
         } else {
             const notificationOpts = {
                 title: 'Add Songs First',
                 message: 'Submit Queue Empty',
                 position: 'tr',
             };
-            this.props.dispatch(error(notificationOpts))
+            sendError(notificationOpts)
         }
     }
     addNew = async e =>{
@@ -204,4 +212,3 @@ class Songs extends Component {
         )
     }
 }
-export default Songs;

@@ -174,7 +174,7 @@ export default class Projects extends Component {
     render() {
         const { projects, auth, changeLocation, spotifyReducer} = this.props
         const { newProjectModal, devices, loading } = this.state
-        if (loading || !isLoaded(projects,auth)) {
+        if (loading) {
             return <LoadingSpinner />
         }
         if(devices.length === 0) {

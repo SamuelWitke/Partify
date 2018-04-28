@@ -6,55 +6,133 @@ import { firebaseConnect, isEmpty } from 'react-redux-firebase'
 import { spinnerWhileLoading } from 'utils/components'
 import classes from './ProjectContainer.scss'
 import Project from '../components/Project';
+import LoadingSpinner from 'components/LoadingSpinner'
+import { success, error, warning, info, removeAll } from 'react-notification-system-redux';
+import Grid from '../components/Grid/Grid.js'
+import {push} from 'react-router-redux'
+
+
+const mapDispatchToProps = (dispatch)=> {
+    return({
+        changeLocation: (loc) => dispatch(push(loc)),
+        sendError: (errorObj) => dispatch(error(errorObj)),
+        sendInfo: (infoObj) => dispatch(info(infoObj)),
+        sendSuccess: (successObj) => dispatch(success(successObj)),
+    })
+}
 
 @firebaseConnect(({ params: { projectname } }) => [
-	{ path: `projects/${projectname}` }
+    { path: `projects/${projectname}` }
 ])
-@connect(({ firebase: { data } }, { params: { projectname } }) => ({
-	project: data.projects && data.projects[projectname]
-}))
+@connect(
+    ({ firebase: { auth, data, profile } }, { params: { projectname } }) => ({
+        projectname: projectname,
+        profile: profile,
+        uid: auth.uid,
+        project: data.projects && data.projects[projectname]
+    }),mapDispatchToProps
+)
 @compose(
-	spinnerWhileLoading(['project']) // handle loading data
+    spinnerWhileLoading(['project']) // handle loading data
 )
 export default class ProjectContainer extends Component {
-	onClick = event => {
-		const {firebase,params} = this.props;
-		const query = event.target.value.trim().toLowerCase()
-		alert(query);	
-		/*
-		const data = {
-			"album" : "Dark Knight Dummo (Feat. Travis Scott)",
-			"downvote" : 0,
-			"img" : "https://i.scdn.co/image/596984c5af902532c982aec0c20d61a060c64623",
-			"name" : "Dark Knight Dummo (Feat. Travis Scott)",
-			"upvote" : 0
-			}
-		const realData ={
-			"album" : "How To Be A Human Being",
-			"downvote" : 0,
-			"img" : "https://i.scdn.co/image/1ad69327d5e8ee9d4347d7273ecbfb0c472f18c0",
-			"name" : "The Other Side Of Paradise",
-			"upvote" : 1
-			}
-		firebase.push(`projects/${params.projectname}/Songs`,realData);
-		alert("Submitted");
-			*/
-		}
+    state = {
+        items: [],
+        loading: true,
+    }
+    async componentWillMount(){
+        const {sendInfo, firebase, profile, projectname} = this.props;
+        const user = profile.displayName;
+        const accessRef = firebase.database().ref(`projects/${projectname}/access_token`);
+        const refreshRef = firebase.database().ref(`projects/${projectname}/refresh_token`);
+        const snapshotAccess = await accessRef.once('value');
+        const snapshotRefresh = await refreshRef.once('value');
+        const body = {
+            user: profile.displayName,
+            name: projectname,
+            access_token: snapshotAccess.val(),
+            refresh_token: snapshotRefresh.val(),
+        }
 
-	render() {
-		const { project, params } = this.props;
-		if (isEmpty(project)) {
-			return <div>ProjectContainer not found</div>
-				}
+        fetch("/user-playlist",{
+            headers: {
+                'Accept': 'application/json, text/plain, */*',
+                'Content-Type': 'application/json'
+            },
+            method: "POST",
+            body: JSON.stringify(body)
+        }).then( res =>{ return res.json()})
+            .then( val => {
+                this.setState({items : val.items, loading: false})
+                sendInfo({
+                       title: 'Your Playlist',
+                      message: 'User Playlist',
+                      position: 'tr',
+                })
 
-		return (
-		<div>
-			<Project 
-				projects={project} 
-				params={params}
-				onClick={this.onClick}
-			/>
-			</div>
-			)
-		}
+            })
+    }
+
+    submitPlaylist = async (item) =>{
+        const {changeLocation, sendSuccess, firebase, uid, profile, projectname} = this.props;
+        const user = profile.displayName;
+        const accessRef = firebase.database().ref(`projects/${projectname}/access_token`);
+        const refreshRef = firebase.database().ref(`projects/${projectname}/refresh_token`);
+        const deviceRef = firebase.database().ref(`projects/${projectname}/device`);
+        const snapshotAccess = await accessRef.once('value');
+        const snapshotRefresh = await refreshRef.once('value');
+        const device = await deviceRef.once('value');
+        const body = {
+            user: profile.displayName,
+            projectname, 
+            id: item.id,
+            device: device.val(),
+            submitedBy: item.name,
+            access_token: snapshotAccess.val(),
+            refresh_token: snapshotRefresh.val(),
+        }
+        fetch("/submit-playlist",{
+            headers: {
+                'Accept': 'application/json, text/plain, */*',
+                'Content-Type': 'application/json'
+            },
+            method: "POST",
+            body: JSON.stringify(body)
+        }).then( res =>{ return res.status})
+            .then( val => {
+                changeLocation('/projects')
+                sendSuccess({
+                    title: 'Playlist Added To The Queue',
+                     message: 'Start Hosting',
+                     position: 'tr',
+                })
+            })
+    }
+
+    render() {
+        const { project, params} = this.props;
+        const { loading, items } = this.state;
+
+        if (isEmpty(project)) {
+            return <div>ProjectContainer not found</div>
+        }
+
+        if (loading) {
+            return <LoadingSpinner />
+        }
+
+        return (
+            <div>
+                <Project 
+                    projects={project} 
+                    params={params}
+                    onClick={this.onClick}
+                />
+                <Grid 
+                    handleTouchTap={this.submitPlaylist}
+                    items = {items}
+                />
+            </div>
+        )
+    }
 }

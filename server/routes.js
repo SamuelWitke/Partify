@@ -157,6 +157,7 @@ router.post('/search', (req, res, next) => {
 router.post('/song-queue', (req, res) => {
     if(req.body == null) res.sendStatus(400)
     const {songs,access_token,device,refresh_token,name}= req.body;
+    console.log(songs[0].project)
     const kueOptions = {};
     let redisUrl = url.parse(process.env.REDISCLOUD_URL||"redis://localhost:6379");
     if(process.env.REDISCLOUD_URL) {
@@ -198,7 +199,7 @@ router.post('/song-queue', (req, res) => {
 
 router.post('/user-playlist', (req, res) => {
     if(req.body == null) res.sendStatus(400)
-    const {songs,access_token,device,uri,refresh_token,user}= req.body;
+    const {access_token,refresh_token,user,name}= req.body;
     const headers = {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
@@ -229,6 +230,89 @@ router.post('/user-playlist', (req, res) => {
             res.json(e.msg)
         }
     })
+})
+
+router.post('/submit-playlist', (req, res) => {
+    if(req.body == null) res.sendStatus(400)
+    const {access_token, refresh_token, user, name, id, submitedBy, projectname, device}= req.body;
+    const headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer '+access_token
+    };
+    var options = {
+        url: `https://api.spotify.com/v1/users/${user}/playlists/${id}/tracks`,
+        headers: headers
+    };
+    const kueOptions = {};
+    let redisUrl = url.parse(process.env.REDISCLOUD_URL||"redis://localhost:6379");
+    if(process.env.REDISCLOUD_URL) {
+        kueOptions.redis = {
+            port: parseInt(redisUrl.port),
+            host: redisUrl.hostname
+        };
+        if(redisUrl.auth) {
+            kueOptions.redis.auth = redisUrl.auth.split(':')[1];
+        }
+    }
+    const jobs = kue.createQueue(kueOptions);
+
+    const project = {
+        name: projectname,
+        votedUpBy: '',
+        votedDownBy: '',
+        votes: 0,
+        submitedBy,
+        author: user
+    }
+
+    request(options, async (error, response, body) => {
+        try { 
+            let msg = JSON.parse(body)
+            if (!msg.error) {
+                msg.items.forEach( item =>{
+                    const song = item.track;
+                    song.project = project;
+                    console.log(song.project)
+                    logger.info("Adding ",song.name," To ",song.project.name)
+                    var songJob = jobs.create(song.project.name,{
+                        title: song.name,
+                        project: song.project.name,
+                        time: song.duration_ms,
+                        uri: song.uri,
+                        access_token: access_token,
+                        refresh_token: refresh_token,
+                        device: device,
+                        key: admin.database().ref(`projects/${song.project.name}/Songs`).push({song}).key,
+                    })
+                        .priority(song.project.votes)
+                        .save( err => {
+                            if(err) { 
+                                logger.error(err.msg); 
+                                res.json(err.msg)
+                            } else {
+                                song.song_id = songJob.id;
+                                admin.database().ref(`projects/${song.project.name}/Songs/${songJob.data.key}/song/song_id`).set(songJob.id)
+                            }
+                        })
+                });
+            res.sendStatus(204);
+        } else {
+            logger.error(msg.error.message)
+            refreshToken(refresh_token,name,false)
+                .then( res => logger.info(res))
+                .catch( e=>{ logger.error(e) });
+            res.send(msg.error.message)
+        }
+    }catch (e){
+        refreshToken(refresh_token,name,false)
+            .then( res => logger.info(res))
+            .catch( e=>{ logger.error(e) });
+        logger.error(e.message)
+        res.json(e.msg)
+    }
+})
+
 })
 
 module.exports = router;
