@@ -50,14 +50,17 @@ export default class Songs extends Component {
             songs: [],
         }
     }
+
     static propTypes = {
         children: PropTypes.object,
         firebase: PropTypes.object.isRequired,
         auth: PropTypes.object
     }
+
     onChange = data => {
         this.setState({songs: [], input: data});
     }
+
     onTouchTap = song => {
         const { songs } = this.state;
         if(songs.includes(song)){
@@ -70,6 +73,7 @@ export default class Songs extends Component {
             this.setState({songs: songs.concat([song])});
         }
     }
+
     submitSongs = async props => {
         const {name} = this.props.params;
         const {sendError,changeLocation, auth, profile, firebase,sendInfo} = this.props;
@@ -134,6 +138,7 @@ export default class Songs extends Component {
             sendError(notificationOpts)
         }
     }
+
     addNew = async e =>{
         const {name} = this.props.params;
         const { firebase, sendError, sendInfo} = this.props;
@@ -177,6 +182,7 @@ export default class Songs extends Component {
             )
             .catch((error => { console.log(error) }));
     }
+
     onSubmitFail = (formErrs, dispatch, err) => {
         props.showError(formErrs ? 'Form Invalid' : err.message || 'Error')
     } 

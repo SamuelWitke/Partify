@@ -17,6 +17,7 @@ const admin = require('firebase-admin');
 const compiler = webpack(webpackConfig)
 const  kue = require('./kue.js');
 const url = require('url')
+const refreshToken = require('./refreshToken.js')
 //const player = require('./player.js')
 
 if (project.env === 'development') {
@@ -97,35 +98,34 @@ admin.database().ref('/kues').on("child_added", function(snapshot) {
     if(jobProcess.indexOf(projects) === -1){
         jobProcess.push(projects)
         logger.info(projects)
-        jobs.process(projects,1,( job, done ) => {
-            //const playerProcess = new Promise((resolve, reject) => {
-                let access_token = `${job.data.access_token}`
-                var headers = {
+        jobs.process(projects,1, async ( job, done ) => {
+                const access_ref = await admin.database().ref(`projects/${job.data.project}/access_token`).once('value');
+                const access_token = `${access_ref.val()}`
+                const refresh_token = job.data.refresh_token;
+                const headers = {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer '+access_token,
                 };
 
-                var dataString = `{"uris":["${job.data.uri}"]}`;
-                var device = job.data.device;
-                var options = {
+                const dataString = `{"uris":["${job.data.uri}"]}`;
+                const device = job.data.device;
+                const options = {
                     url: `https://api.spotify.com/v1/me/player/play?device_id=${device}`,
                     method: 'PUT',
                     headers: headers,
                     body:  dataString
                 };
-
+                //Store the job's done function in a global variable so we can access it from elsewhere.
+                 _exitActivJob = () => {
+                    done();
+                };
                 request(options, async (error, response, body) => {
-                    if (!error) {
+                    if (body.indexOf('error') === -1) {
                         logger.info("Playing",job.data.title);
                         await admin.database().ref(`projects/${job.data.project}/Songs/${job.data.key}/song/active`).set(true)
-                        //Store the job's done function in a global variable so we can access it from elsewhere.
-                        _exitActivJob = () => {
-                            done();
-                            // resolve("Song Deleted");
-                        };
                         setTimeout( async () => {
-                            let del_ref = admin.database().ref(`projects/${job.data.project}/Songs/${job.data.key}`);
+                            const del_ref = admin.database().ref(`projects/${job.data.project}/Songs/${job.data.key}`);
                             try{
                                 await del_ref.remove()
                                 logger.info('song removed');
@@ -133,25 +133,33 @@ admin.database().ref('/kues').on("child_added", function(snapshot) {
                                 console.log('Error deleting data:', error);
                             };
                             done();
-                            //resolve("Song Finished");
                         }, job.data.time);
                     } else {
-                        logger.error(error.message) 
-                        done();
-                        //reject();
+                        logger.error(body) 
+                        try{  
+                            const res = await refreshToken(refresh_token,job.data.project,false)
+                            const del_ref = admin.database().ref(`projects/${job.data.project}/Songs/${job.data.key}`);
+                            try{
+                                await del_ref.remove()
+                                logger.info('song removed');
+                            }catch( error ){
+                                console.log('Error deleting data:', error);
+                            }
+                            logger.info(res)
+                        }catch(e){logger.error(e) };
+                            done();
                     }
                 })
             })
-            //player(job,done,_exitActivJob).then( res => logger.success(res) )
-        // });
     }
 })
 
-admin.database().ref('/projects').on("child_added", function(snapshot) {
+admin.database().ref('/kues').once("child_added", function(snapshot) {
     const projects = snapshot.val();
-    let ref = admin.database().ref(`/projects/${projects.name}/Songs`)
+    let ref = admin.database().ref(`/projects/${projects}/Songs`)
     ref.on("child_changed", (snapshot) => {
         let song = snapshot.val()
+        if(song){
         kue.Job.get( song.song.song_id, ( err, job ) => {
             try{
                 job.priority(-song.song.project.votes).update(() => {
@@ -163,8 +171,8 @@ admin.database().ref('/projects').on("child_added", function(snapshot) {
                 logger.error(e.message)
             }
         });
+        }
     })
-
     ref.on("child_removed", function(snapshot) {
         let song = snapshot.val()
         try{
@@ -185,7 +193,6 @@ admin.database().ref('/projects').on("child_added", function(snapshot) {
         } catch(e){logger.error(e.message)}
     })
 });
-
 
 const routes = require('./routes');
 app.use(compress())

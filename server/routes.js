@@ -143,7 +143,7 @@ router.post('/search', (req, res, next) => {
 
 router.post('/song-queue', (req, res) => {
     if(req.body == null) res.sendStatus(400)
-    const {songs,access_token,device,refresh_token,name}= req.body;
+    const {songs,device,refresh_token,name}= req.body;
     let redisUrl = url.parse(process.env.REDISCLOUD_URL||"redis://localhost:6379");
     const kueOptions = {};
     if(process.env.REDISCLOUD_URL) {
@@ -164,7 +164,6 @@ router.post('/song-queue', (req, res) => {
             project: song.project.name,
             time: song.duration_ms,
             uri: song.uri,
-            access_token: access_token,
             refresh_token: refresh_token,
             device: device,
             key: admin.database().ref(`projects/${song.project.name}/Songs`).push({song}).key,
@@ -220,7 +219,7 @@ router.post('/user-playlist', (req, res) => {
 
 router.post('/submit-playlist', (req, res) => {
     if(req.body == null) res.sendStatus(400)
-    const {access_token, refresh_token, user, name, id, submitedBy, projectname, device}= req.body;
+    const {refresh_token, user, name, id, submitedBy, projectname, device}= req.body;
     const headers = {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
@@ -265,7 +264,6 @@ router.post('/submit-playlist', (req, res) => {
                         project: song.project.name,
                         time: song.duration_ms,
                         uri: song.uri,
-                        access_token: access_token,
                         refresh_token: refresh_token,
                         device: device,
                         key: admin.database().ref(`projects/${song.project.name}/Songs`).push({song}).key,
