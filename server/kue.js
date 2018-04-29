@@ -1,8 +1,8 @@
 const kue = require('kue')
 const redis = require('redis');
 const url = require('url')
-let redisUrl = url.parse(process.env.REDISCLOUD_URL||"redis://localhost:6379");
-let redisClient = redis.createClient(parseInt(redisUrl.port), redisUrl.hostname);
+const redisUrl = url.parse(process.env.REDISCLOUD_URL||"redis://localhost:6379");
+const redisClient = redis.createClient(parseInt(redisUrl.port), redisUrl.hostname);
 
 if(redisUrl.auth)
     redisClient.auth(redisUrl.auth.split(':')[1]);

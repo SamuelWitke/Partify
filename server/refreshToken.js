@@ -1,10 +1,10 @@
 const logger = require('../build/lib/logger')
 const request = require('request');
 const admin = require('firebase-admin');
+
 const refreshToken = (refresh_token,name,device) => {
     return new Promise((resolve, reject) =>  {
         logger.info("Requesting refresh_token",name)
-        // requesting access token from refresh token
         var authOptions = {
             url: 'https://accounts.spotify.com/api/token',
             headers: { 'Authorization': 'Basic ' + (new Buffer(process.env.SPOTIFYCLIENT+ ':' + process.env.SPOTIFYSECRET).toString('base64')) },

@@ -13,7 +13,9 @@
     "start": "NODE_ENV=production node build/scripts/start",
     "heroku-postbuild": "npm run build",
     "lint": "eslint .",
-    "lint:fix": "npm run lint -- --fix"
+    "lint:fix": "npm run lint -- --fix",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
   },
   "author": "testuser (https://github.com/testuser)",
   "license": "MIT",
@@ -115,5 +117,11 @@
     "webpack-hot-middleware": "^2.13.2",
     "whatwg-fetch": "^2.0.3",
     "yargs": "^8.0.1"
+  },
+  "devDependencies": {
+    "@storybook/react": "^3.4.3",
+    "@storybook/addon-actions": "^3.4.3",
+    "@storybook/addon-links": "^3.4.3",
+    "@storybook/addons": "^3.4.3"
   }
 }

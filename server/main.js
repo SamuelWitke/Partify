@@ -1,12 +1,10 @@
 const express = require('express')
 const project = require('../project.config')
-
 if (project.env === 'development') {
     const dotenv = require('dotenv');
     const result = dotenv.config();
     dotenv.load();
 }
-
 const path = require('path')
 const webpack = require('webpack')
 const logger = require('../build/lib/logger')
@@ -19,8 +17,7 @@ const admin = require('firebase-admin');
 const compiler = webpack(webpackConfig)
 const  kue = require('./kue.js');
 const url = require('url')
-
-const player = require('./player.js')
+//const player = require('./player.js')
 
 if (project.env === 'development') {
 
@@ -80,10 +77,10 @@ admin.initializeApp({
 const request = require('request');
 let _exitActivJob;
 
-admin.database().ref('/kues').on("child_added", function(snapshot) {
-   const projects = snapshot.val();
-    console.log(projects)
+const jobProcess = [];
 
+admin.database().ref('/kues').on("child_added", function(snapshot) {
+    const projects = snapshot.val();
     const kueOptions = {};
     let redisUrl = url.parse(process.env.REDISCLOUD_URL||"redis://localhost:6379");
     if(process.env.REDISCLOUD_URL) {
@@ -97,62 +94,62 @@ admin.database().ref('/kues').on("child_added", function(snapshot) {
     }
 
     const jobs = kue.createQueue(kueOptions);
-    if(projects){
-        console.log("processing",projects)
+    if(jobProcess.indexOf(projects) === -1){
+        jobProcess.push(projects)
+        logger.info(projects)
         jobs.process(projects,1,( job, done ) => {
-        const playerProcess = new Promise((resolve, reject) => {
-        let access_token = `${job.data.access_token}`
-        var headers = {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer '+access_token,
-        };
-
-        var dataString = `{"uris":["${job.data.uri}"]}`;
-        var device = job.data.device;
-        var options = {
-            url: `https://api.spotify.com/v1/me/player/play?device_id=${device}`,
-            method: 'PUT',
-            headers: headers,
-            body:  dataString
-        };
-
-        request(options, async (error, response, body) => {
-            if (!error) {
-                logger.info("Playing",job.data.title);
-                await admin.database().ref(`projects/${job.data.project}/Songs/${job.data.key}/song/active`).set(true)
-                //Store the job's done function in a global variable so we can access it from elsewhere.
-                _exitActivJob = () => {
-                    resolve("Song Deleted");
-                    done();
+            //const playerProcess = new Promise((resolve, reject) => {
+                let access_token = `${job.data.access_token}`
+                var headers = {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer '+access_token,
                 };
 
-                setTimeout( async () => {
-                    let del_ref = admin.database().ref(`projects/${job.data.project}/Songs/${job.data.key}`);
-                    try{
-                        await del_ref.remove()
-                        logger.info('song removed');
-                    }catch( error ){
-                        console.log('Error deleting data:', error);
-                    };
-                    done();
-                    resolve("Song Finished");
-                }, job.data.time);
-            } else {
-                logger.error(error.message) 
-                done();
-                reject();
-            }
-        })
-        }).then( res => logger.success(res) )
+                var dataString = `{"uris":["${job.data.uri}"]}`;
+                var device = job.data.device;
+                var options = {
+                    url: `https://api.spotify.com/v1/me/player/play?device_id=${device}`,
+                    method: 'PUT',
+                    headers: headers,
+                    body:  dataString
+                };
+
+                request(options, async (error, response, body) => {
+                    if (!error) {
+                        logger.info("Playing",job.data.title);
+                        await admin.database().ref(`projects/${job.data.project}/Songs/${job.data.key}/song/active`).set(true)
+                        //Store the job's done function in a global variable so we can access it from elsewhere.
+                        _exitActivJob = () => {
+                            done();
+                            // resolve("Song Deleted");
+                        };
+                        setTimeout( async () => {
+                            let del_ref = admin.database().ref(`projects/${job.data.project}/Songs/${job.data.key}`);
+                            try{
+                                await del_ref.remove()
+                                logger.info('song removed');
+                            }catch( error ){
+                                console.log('Error deleting data:', error);
+                            };
+                            done();
+                            //resolve("Song Finished");
+                        }, job.data.time);
+                    } else {
+                        logger.error(error.message) 
+                        done();
+                        //reject();
+                    }
+                })
+            })
             //player(job,done,_exitActivJob).then( res => logger.success(res) )
-        });
+        // });
     }
 })
 
 admin.database().ref('/projects').on("child_added", function(snapshot) {
-   const projects = snapshot.val();
-     let ref = admin.database().ref(`/projects/${projects.name}/Songs`)
+    const projects = snapshot.val();
+    let ref = admin.database().ref(`/projects/${projects.name}/Songs`)
     ref.on("child_changed", (snapshot) => {
         let song = snapshot.val()
         kue.Job.get( song.song.song_id, ( err, job ) => {
@@ -176,6 +173,7 @@ admin.database().ref('/projects').on("child_added", function(snapshot) {
                     try{
                         if(job.state('active') && song.song.active && _exitActivJob){
                             _exitActivJob();
+                            _exitActivJob = undefined;
                         }
                         logger.info("Song",song.song.name,"removed",song.song.song_id)
                         job.remove();

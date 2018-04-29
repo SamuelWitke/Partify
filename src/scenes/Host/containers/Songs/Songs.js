@@ -38,7 +38,8 @@ const fixedbutton = {
         projects: populate(firebase, 'projects', populates),
         profile,
         params: params
-    }))
+    }),mapDispatchToProps
+)
 
 export default class Songs extends Component {
     constructor(props) {
@@ -55,8 +56,7 @@ export default class Songs extends Component {
         auth: PropTypes.object
     }
     onChange = data => {
-        this.setState({songs: []})
-        this.setState({ input: data});
+        this.setState({songs: [], input: data});
     }
     onTouchTap = song => {
         const { songs } = this.state;
@@ -136,11 +136,12 @@ export default class Songs extends Component {
     }
     addNew = async e =>{
         const {name} = this.props.params;
+        const { firebase, sendError, sendInfo} = this.props;
         const {input} = this.state;
-        const accessRef = this.props.firebase.database().ref(`projects/${name}/access_token`);
-        const refreshRef = this.props.firebase.database().ref(`projects/${name}/refresh_token`);
-        const snapshotAccess = await accessRef.once('value');
-        const snapshotRefresh = await refreshRef.once('value');
+        const accessRef         = firebase.database().ref(`projects/${name}/access_token`);
+        const refreshRef        = firebase.database().ref(`projects/${name}/refresh_token`);
+        const snapshotAccess    = await accessRef.once('value');
+        const snapshotRefresh   = await refreshRef.once('value');
         const body = {
             search: input, 
             access_token: snapshotAccess.val(), 
@@ -162,7 +163,7 @@ export default class Songs extends Component {
                         message: 'Try another search',
                         position: 'tr',
                     };
-                    this.props.dispatch(error(notificationOpts))
+                   sendError(notificationOpts)
                 }
                 else {
                     const notificationOpts = {
@@ -170,9 +171,8 @@ export default class Songs extends Component {
                         message: 'Results',
                         position: 'tr',
                     };
-                    this.props.dispatch(info(notificationOpts))
+                    sendInfo(notificationOpts)
                     this.setState({items: text.tracks.items});
-                    this.forceUpdate();
                 }}
             )
             .catch((error => { console.log(error) }));

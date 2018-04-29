@@ -144,8 +144,9 @@ router.post('/search', (req, res, next) => {
 router.post('/song-queue', (req, res) => {
     if(req.body == null) res.sendStatus(400)
     const {songs,access_token,device,refresh_token,name}= req.body;
+    console.log(songs[0].project)
     let redisUrl = url.parse(process.env.REDISCLOUD_URL||"redis://localhost:6379");
-    const kueOptions = {};
+    let redisUrl = url.parse(process.env.REDISCLOUD_URL||"redis://localhost:6379");
     if(process.env.REDISCLOUD_URL) {
         kueOptions.redis = {
             port: parseInt(redisUrl.port),
@@ -259,8 +260,9 @@ router.post('/submit-playlist', (req, res) => {
                 msg.items.forEach( item =>{
                     const song = item.track;
                     song.project = project;
+                    console.log(song.project)
                     logger.info("Adding ",song.name," To ",song.project.name)
-                    const songJob = jobs.create(song.project.name,{
+                    var songJob = jobs.create(song.project.name,{
                         title: song.name,
                         project: song.project.name,
                         time: song.duration_ms,
@@ -270,8 +272,8 @@ router.post('/submit-playlist', (req, res) => {
                         device: device,
                         key: admin.database().ref(`projects/${song.project.name}/Songs`).push({song}).key,
                     })
-                    .priority(song.project.votes)
-                    .save( err => {
+                        .priority(song.project.votes)
+                        .save( err => {
                             if(err) { 
                                 logger.error(err.msg); 
                                 res.json(err.msg)
@@ -287,16 +289,17 @@ router.post('/submit-playlist', (req, res) => {
             refreshToken(refresh_token,name,false)
                 .then( res => logger.info(res))
                 .catch( e=>{ logger.error(e) });
-            res.json(msg.error.message)
+            res.send(msg.error.message)
         }
     }catch (e){
-        logger.error(e.message)
         refreshToken(refresh_token,name,false)
             .then( res => logger.info(res))
             .catch( e=>{ logger.error(e) });
+        logger.error(e.message)
         res.json(e.msg)
     }
     })
+
 })
 
 module.exports = router;
