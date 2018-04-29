@@ -2,6 +2,11 @@
 
 Partify is a free open source Spotify-powered app that lets your guests choose which music should be played using their smartphones to submit and vote on songs.
 
+* Features Include
+  * User Upvote / Downvote 
+  * Fallback playlist
+  * No Download Needed Anonymous Sign In
+  
 ### How To install and run locally
 ```
 This project requires redis so if you don't have it 
@@ -12,7 +17,7 @@ yarn start:dev || yarn start || yarn run:dev
 ```
 
 ### Steps
-```
+```tem 2
 1. Make an account
 2. Host a project name on a device 
 3. Connect to project name 
