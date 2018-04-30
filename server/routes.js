@@ -219,7 +219,7 @@ router.post('/user-playlist', (req, res) => {
 
 router.post('/submit-playlist', (req, res) => {
     if(req.body == null) res.sendStatus(400)
-    const {refresh_token, user, name, id, submitedBy, projectname, device}= req.body;
+    const {refresh_token, user, access_token ,name, id, submitedBy, projectname, device}= req.body;
     const headers = {
         'Accept': 'application/json',
         'Content-Type': 'application/json',

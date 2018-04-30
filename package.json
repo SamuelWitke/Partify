@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "clean:redis": "redis-cli flushall",
+    "main:on":"heroku maintenance:on",
+    "main:off":"heroku maintenance:off",
     "clean": " rimraf dist",
     "compile": "node build/scripts/compile",
     "build": "npm run clean && cross-env NODE_ENV=production npm run compile",
@@ -68,6 +70,7 @@
     "history": "^4.7.2",
     "html-webpack-plugin": "^2.29.0",
     "husky": "^0.14.3",
+    "immutable": "^3.8.2",
     "ip": "^1.1.5",
     "js-cookie": "^2.2.0",
     "kue": "^0.11.6",
@@ -119,9 +122,9 @@
     "yargs": "^8.0.1"
   },
   "devDependencies": {
-    "@storybook/react": "^3.4.3",
     "@storybook/addon-actions": "^3.4.3",
     "@storybook/addon-links": "^3.4.3",
-    "@storybook/addons": "^3.4.3"
+    "@storybook/addons": "^3.4.3",
+    "@storybook/react": "^3.4.3"
   }
 }

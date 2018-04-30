@@ -11,7 +11,6 @@ import { success, error, warning, info, removeAll } from 'react-notification-sys
 import Grid from '../components/Grid/Grid.js'
 import {push} from 'react-router-redux'
 
-
 const mapDispatchToProps = (dispatch)=> {
     return({
         changeLocation: (loc) => dispatch(push(loc)),
@@ -100,7 +99,7 @@ export default class ProjectContainer extends Component {
             body: JSON.stringify(body)
         }).then( res =>{ return res.status})
             .then( val => {
-                changeLocation('/projects')
+                changeLocation(`/Host/Party/${projectname}`)
                 sendSuccess({
                     title: 'Playlist Added To The Queue',
                      message: 'Start Hosting',
