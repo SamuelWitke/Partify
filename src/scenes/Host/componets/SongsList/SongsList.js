@@ -27,10 +27,7 @@ const styles = {
         height: 450,
     },
 };
-
-
-
-const SongsList = ({onDelete,upVote,downVote,songs,admin,auth,uid}) => (
+const SongsList = ({onDelete,activeURI,upVote,downVote,songs,admin,auth,uid}) => (
     <Paper>
         <div className={classes.list}>
             <div style={styles.root}>
@@ -45,7 +42,8 @@ const SongsList = ({onDelete,upVote,downVote,songs,admin,auth,uid}) => (
                         const disabledUp = typeof song.song.project.votedUpBy == 'object' ? Object.keys(song.song.project.votedUpBy).map( key => key).includes(uid)  : false;
                         const disabledDown = typeof song.song.project.votedDownBy == 'object' ? Object.keys(song.song.project.votedDownBy).map( key => key).includes(uid)  : false;
                         const visableDelete = song.song.project.submitedBy === uid  
-                        const active = song.song.active ? true : false;
+                        console.log(song.song.uri, song.song.uri === activeURI, activeURI)
+                        const active = song.song.uri === activeURI ? true : false;
                         const author = song.song.project.author;
                         return (
                             <span key={id}>

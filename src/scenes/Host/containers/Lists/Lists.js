@@ -36,6 +36,7 @@ const mapDispatchToProps = (dispatch)=> {
 @connect(({ firebase, firebase: { auth, profile },},props) => (
     {
         project:  firebase.data.projects ? firebase.data.projects[`${props.params.name}`] : "" , // lodash's get can also be used
+        active: firebase.data.projects ? firebase.data.projects[`${props.params.name}`].active : "" ,
         auth: auth,
         name: props.params.name,
         profile,
@@ -124,13 +125,15 @@ export default class Lists extends Component {
 
     render() {
 
-        const {project,params,uid,profile} = this.props;
+        const {project,params,uid,profile,active} = this.props;
         const songs = project ? project.Songs: null;
+        console.log(" lists ",active)
         return (
             <div> 
                 { !isEmpty(songs) ? (
                     <SongsList 
                         uid={uid}
+                        activeURI={active}
                         onDelete={this.onDelete}
                         upVote={this.upVote}
                         downVote={this.downVote}
