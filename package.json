@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "clean:redis": "redis-cli flushall",
-    "main:on":"heroku maintenance:on",
-    "main:off":"heroku maintenance:off",
+    "main:on": "heroku maintenance:on",
+    "main:off": "heroku maintenance:off",
     "clean": " rimraf dist",
     "compile": "node build/scripts/compile",
     "build": "npm run clean && cross-env NODE_ENV=production npm run compile",
@@ -107,6 +107,7 @@
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.2.0",
     "request": "^2.83.0",
+    "request-promise": "^4.2.2",
     "rimraf": "^2.6.1",
     "sass-loader": "^6.0.5",
     "spotify-web-api-js": "^0.23.0",
