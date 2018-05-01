@@ -127,7 +127,6 @@ export default class Lists extends Component {
 
         const {project,params,uid,profile,active} = this.props;
         const songs = project ? project.Songs: null;
-        console.log(" lists ",active)
         return (
             <div> 
                 { !isEmpty(songs) ? (

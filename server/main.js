@@ -82,6 +82,8 @@ admin.initializeApp({
 const jobProcess = [];
 
 let _exitActivJob;
+let timeOutPlayer;
+
 admin.database().ref('/kues').on("child_added", function(snapshot) {
     const projects = snapshot.val();
     const kueOptions = {};
@@ -103,6 +105,7 @@ admin.database().ref('/kues').on("child_added", function(snapshot) {
         jobs.process(projects,1, async ( job, done ) => {
             const access_ref = await admin.database().ref(`projects/${job.data.project}/access_token`).once('value');
             await admin.database().ref(`projects/${job.data.project}/active/`).set(job.data.uri)
+
             const access_token = `${access_ref.val()}`
             const refresh_token = job.data.refresh_token;
             const headers = {
@@ -124,34 +127,41 @@ admin.database().ref('/kues').on("child_added", function(snapshot) {
                 done();
             };
 
-            request(options)
-                .then( async (response) => {
-                    logger.info("Playing",job.data.title);
-                    setTimeout( async () => {
-                        const del_ref = admin.database().ref(`projects/${job.data.project}/Songs/${job.data.key}`);
-                        try{
-                            await del_ref.remove()
-                            logger.info('song removed');
-                        }catch( error ){
-                            console.log('Error deleting data:', error);
-                        };
+            const song_ref = admin.database().ref(`projects/${job.data.project}/Songs/${job.data.key}`);
+
+            const songSnap = await song_ref.once('value');
+            const active = songSnap.exists();
+            if(active){
+                request(options)
+                    .then( async (response) => {
+                        logger.info("Playing",job.data.title);
+                        timeOutPlayer = setTimeout( async () => {
+                            const del_ref = admin.database().ref(`projects/${job.data.project}/Songs/${job.data.key}`);
+                            try{
+                                await del_ref.remove()
+                                logger.info('song removed'+job.data.title);
+                            }catch( error ){
+                                console.log('Error deleting data:', error);
+                            };
+                            done();
+                        }, job.data.time)
+                    }).catch( async e => {
+                        logger.error(e) 
+                        try{  
+                            const res = await refreshToken(refresh_token,job.data.project,false)
+                            const del_ref = admin.database().ref(`projects/${job.data.project}/Songs/${job.data.key}`);
+                            try{
+                                await del_ref.remove()
+                                logger.info('song removed');
+                            }catch( error ){
+                                console.log('Error deleting data:', error);
+                            }
+                            logger.info(res)
+                        }catch(e){logger.error(e) };
                         done();
-                    }, job.data.time)
-                }).catch( async e => {
-                    logger.error(e) 
-                    try{  
-                        const res = await refreshToken(refresh_token,job.data.project,false)
-                        const del_ref = admin.database().ref(`projects/${job.data.project}/Songs/${job.data.key}`);
-                        try{
-                            await del_ref.remove()
-                            logger.info('song removed');
-                        }catch( error ){
-                            console.log('Error deleting data:', error);
-                        }
-                        logger.info(res)
-                    }catch(e){logger.error(e) };
-                    done();
-                })
+                        clearTimeout(timeOutPlayer);
+                    })
+            }
         })
     }
 })
@@ -161,6 +171,7 @@ admin.database().ref('/kues').on("child_added", function(snapshot) {
     let ref = admin.database().ref(`/projects/${projects}/Songs`)
     ref.on("child_changed", (snapshot) => {
         let song = snapshot.val()
+        try{
         if(song){
             kue.Job.get( song.song.song_id, ( err, job ) => {
                 try{
@@ -173,7 +184,10 @@ admin.database().ref('/kues').on("child_added", function(snapshot) {
                     logger.error(e.message)
                 }
             });
-        }
+                    }
+        }catch(e){
+                logger.error(e.message)
+           }
     })
     ref.on("child_removed", async (snapshot) => {
         let song = snapshot.val()
@@ -185,8 +199,10 @@ admin.database().ref('/kues').on("child_added", function(snapshot) {
                 if(!err){
                     try{
                         if(job.state('active') && song.song.uri === active && _exitActivJob){
+                            clearTimeout(timeOutPlayer);
                             _exitActivJob();
                             _exitActivJob = undefined;
+                            timeOutPlayer = undefined;
                         }
                         logger.info("Song",song.song.name,"removed",song.song.song_id)
                         job.remove();

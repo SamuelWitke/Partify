@@ -24,7 +24,6 @@ const styles = {
         display: 'flex',
         flexWrap: 'wrap',
         width: 500,
-        height: 450,
     },
 };
 const SongsList = ({onDelete,activeURI,upVote,downVote,songs,admin,auth,uid}) => (
@@ -42,7 +41,6 @@ const SongsList = ({onDelete,activeURI,upVote,downVote,songs,admin,auth,uid}) =>
                         const disabledUp = typeof song.song.project.votedUpBy == 'object' ? Object.keys(song.song.project.votedUpBy).map( key => key).includes(uid)  : false;
                         const disabledDown = typeof song.song.project.votedDownBy == 'object' ? Object.keys(song.song.project.votedDownBy).map( key => key).includes(uid)  : false;
                         const visableDelete = song.song.project.submitedBy === uid  
-                        console.log(song.song.uri, song.song.uri === activeURI, activeURI)
                         const active = song.song.uri === activeURI ? true : false;
                         const author = song.song.project.author;
                         return (
