@@ -66,11 +66,11 @@ admin.database().ref('/kues').on("child_added", (snapshot) => {
                 .then( async (response) => {
                     logger.info("Playing",job.data.title+5);
                     timeOutPlayer.player = setTimeout( async () => {
+                        _exitActivJob = undefined;
+                        timeOutPlayer.player = undefined;
                         const del_ref = admin.database().ref(`projects/${job.data.project}/Songs/${job.data.key}`);
                         await del_ref.remove()
                         logger.info('song removed'+job.data.title);
-                        _exitActivJob = undefined;
-                        timeOutPlayer.player = undefined;
                         done();
                     }, job.data.time)
                 }).catch( async e => {
