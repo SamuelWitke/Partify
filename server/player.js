@@ -61,6 +61,7 @@ admin.database().ref('/kues').on("child_added", (snapshot) => {
         const active = await admin.database().ref(`projects/${job.data.project}/active/`).once('value')
 
         if(songSnap.exists()&&active.val() === job.data.uri){
+            try{
             request(options)
                 .then( async (response) => {
                     logger.info("Playing",job.data.title+5);
@@ -78,6 +79,13 @@ admin.database().ref('/kues').on("child_added", (snapshot) => {
                     done();
                     clearTimeout(timeOutPlayer.player);
                 })
+            }catch( e ){
+                logger.error("ERROR in request",e) 
+                    const res = await refreshToken(refresh_token,job.data.project,false)
+                    const del_ref = admin.database().ref(`projects/${job.data.project}/Songs/${job.data.key}`);
+                    await del_ref.remove()
+                    done();
+            }
         }else{
            const del_ref = admin.database().ref(`projects/${job.data.project}/Songs/${job.data.key}`);
            await del_ref.remove()
