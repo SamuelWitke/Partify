@@ -16,6 +16,7 @@ const app = express()
 const compiler = webpack(webpackConfig)
 const url = require('url')
 const refreshToken = require('./refreshToken.js')
+const  kue = require('./kue.js');
 
 //const player = require('./player.js')
 

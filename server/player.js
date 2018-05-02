@@ -22,14 +22,14 @@ if(process.env.REDISCLOUD_URL) {
     }
 }
 
-
-let _exitActivJob;
-let timeOutPlayer = {player: undefined};
-
 admin.database().ref('/kues').on("child_added", (snapshot) => {
+    let _exitActivJob;
+    let timeOutPlayer = {player: undefined};
+
     const projects = snapshot.val();
     const jobs = kue.createQueue(kueOptions);
     logger.info(projects)
+
     jobs.process(projects,1, async ( job, done ) => {
         const access_ref = await admin.database().ref(`projects/${job.data.project}/access_token`).once('value');
         await admin.database().ref(`projects/${job.data.project}/active/`).set(job.data.uri)
@@ -56,65 +56,49 @@ admin.database().ref('/kues').on("child_added", (snapshot) => {
         };
 
         const song_ref = admin.database().ref(`projects/${job.data.project}/Songs/${job.data.key}`);
-
         const songSnap = await song_ref.once('value');
-        const active = songSnap.exists();
-        if(active){
+
+        if(songSnap.exists()){
             request(options)
                 .then( async (response) => {
                     logger.info("Playing",job.data.title);
                     timeOutPlayer.player = setTimeout( async () => {
                         const del_ref = admin.database().ref(`projects/${job.data.project}/Songs/${job.data.key}`);
-                        try{
-                            await del_ref.remove()
-                            logger.info('song removed'+job.data.title);
-                        }catch( error ){
-                            console.log('Error deleting data:', error);
-                        };
+                        await del_ref.remove()
+                        logger.info('song removed'+job.data.title);
                         done();
                     }, job.data.time)
                 }).catch( async e => {
-                    logger.error(e) 
-                    try{  
-                        const res = await refreshToken(refresh_token,job.data.project,false)
-                        const del_ref = admin.database().ref(`projects/${job.data.project}/Songs/${job.data.key}`);
-                        try{
-                            await del_ref.remove()
-                            logger.info('song removed');
-                        }catch( error ){
-                            console.log('Error deleting data:', error);
-                        }
-                        logger.info(res)
-                    }catch(e){logger.error(e) };
+                    logger.error("ERROR in request",e) 
+                    const res = await refreshToken(refresh_token,job.data.project,false)
+                    const del_ref = admin.database().ref(`projects/${job.data.project}/Songs/${job.data.key}`);
+                    await del_ref.remove()
                     done();
                     clearTimeout(timeOutPlayer.player);
                 })
+        }else{
+            done();
         }
-        done();
     })
-})
 
-admin.database().ref('/kues').on("child_added", function(snapshot) {
-    const projects = snapshot.val();
     let ref = admin.database().ref(`/projects/${projects}/Songs`)
     ref.on("child_changed", (snapshot) => {
         try{
             let song = snapshot.val()
-            if(song){
-                kue.Job.get( song.song.song_id, ( err, job ) => {
-                    try{
-                        job.priority(-song.song.project.votes).update(() => {
-                            if(!err){
-                                logger.info("Changed",song.song.project.votes,song.song.song_id,song.song.name,job.data.title);
-                            }else{
-                                throw Error('Kue Priority Error')
-                            }
-                        })
-                    }catch(e){logger.error(e.message)}
-                });
-            }throw Error('Song Not Found')
+            kue.Job.get( song.song.song_id, ( err, job ) => {
+                try{
+                    job.priority(-song.song.project.votes).update(() => {
+                        if(!err){
+                            logger.info("Changed",song.song.project.votes,song.song.song_id,song.song.name,job.data.title);
+                        }else{
+                            throw Error('Kue Priority Error')
+                        }
+                    })
+                }catch(e){logger.error(e.message)}
+            });
         }catch(e){logger.error(e.message)}
     })
+
     ref.on("child_removed", async (snapshot) => {
         let song = snapshot.val()
         let ref = admin.database().ref(`/projects/${projects}/active`);
@@ -123,19 +107,21 @@ admin.database().ref('/kues').on("child_added", function(snapshot) {
         try{
             kue.Job.get(song.song.song_id, ( err, job ) => {
                 if(!err){
-                    try{
-                        if(job.state('active') && song.song.uri === active && _exitActivJob && timeOutPlayer.player){
-                            _exitActivJob();
-                            _exitActivJob = undefined;
-                            clearTimeout(timeOutPlayer.player);
-                            timeOutPlayer.player = undefined;
-                        }
-                        logger.info("Song",song.song.name,"removed",song.song.song_id)
-                        job.remove();
-                    }catch(e){logger.error(e.message)}
-                }throw new Error('Kue Removal Error')
+                    if(job.state('active') && song.song.uri === active && _exitActivJob && timeOutPlayer.player){
+                        _exitActivJob();
+                        _exitActivJob = undefined;
+                        clearTimeout(timeOutPlayer.player);
+                        timeOutPlayer.player = undefined;
+                    }
+                    logger.info("Song",song.song.name,"removed",song.song.song_id)
+                    job.remove();
+                }else {
+                    throw new Error('Kue Removal Error')
+                }
             })
-        }catch(e){logger.error(e.message)}
+        }catch( e ){
+            logger.error('Child removed',e)
+        }
     })
 });
 
