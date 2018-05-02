@@ -63,7 +63,7 @@ admin.database().ref('/kues').on("child_added", (snapshot) => {
         if(songSnap.exists()&&active.val() === job.data.uri){
             request(options)
                 .then( async (response) => {
-                    logger.info("Playing",job.data.title);
+                    logger.info("Playing",job.data.title+5);
                     timeOutPlayer.player = setTimeout( async () => {
                         const del_ref = admin.database().ref(`projects/${job.data.project}/Songs/${job.data.key}`);
                         await del_ref.remove()
