@@ -79,7 +79,9 @@ admin.database().ref('/kues').on("child_added", (snapshot) => {
                     clearTimeout(timeOutPlayer.player);
                 })
         }else{
-            done();
+           const del_ref = admin.database().ref(`projects/${job.data.project}/Songs/${job.data.key}`);
+           await del_ref.remove()
+           done();
         }
     })
 
