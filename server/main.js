@@ -65,7 +65,16 @@ if (project.env === 'development') {
     // Serving ~/dist by default. Ideally these files should be served by
     // the web server and not the app server, but this helps to demo the
     // server in production.
+    //// Keep Heroku Alive
 }
+if( process.env.NODE_ENV === 'production' ){
+    // Keep Heroku From Idling
+    const http = require("http");
+    setInterval(function() {
+        http.get("http://http://partifystart.herokuapp.com");
+    }, 300000); // every 5 minutes (300000) 
+}
+
 const routes = require('./routes');
 const admin = require('./player.js');
 
