@@ -71,7 +71,7 @@ if( process.env.NODE_ENV === 'production' ){
     // Keep Heroku From Idling
     const http = require("http");
     setInterval(function() {
-        http.get("http://http://partifystart.herokuapp.com");
+        http.get("http://partifystart.herokuapp.com");
     }, 300000); // every 5 minutes (300000) 
 }
 
