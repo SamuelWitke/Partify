@@ -58,7 +58,9 @@ admin.database().ref('/kues').on("child_added", (snapshot) => {
         const song_ref = admin.database().ref(`projects/${job.data.project}/Songs/${job.data.key}`);
         const songSnap = await song_ref.once('value');
 
-        if(songSnap.exists()){
+        const active = await admin.database().ref(`projects/${job.data.project}/active/`).once('value')
+
+        if(songSnap.exists()&&active.val() === job.data.uri){
             request(options)
                 .then( async (response) => {
                     logger.info("Playing",job.data.title);
@@ -91,7 +93,7 @@ admin.database().ref('/kues').on("child_added", (snapshot) => {
                         if(!err){
                             logger.info("Changed",song.song.project.votes,song.song.song_id,song.song.name,job.data.title);
                         }else{
-                            throw Error('Kue Priority Error')
+                            throw new Error('Kue Priority Error')
                         }
                     })
                 }catch(e){logger.error(e.message)}
@@ -116,7 +118,7 @@ admin.database().ref('/kues').on("child_added", (snapshot) => {
                     logger.info("Song",song.song.name,"removed",song.song.song_id)
                     job.remove();
                 }else {
-                    throw new Error('Kue Removal Error')
+                    logger.error('Kue Removal Error')
                 }
             })
         }catch( e ){
