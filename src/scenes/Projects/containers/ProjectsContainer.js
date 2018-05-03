@@ -43,9 +43,6 @@ const populates = [{ child: 'createdBy', root: 'users' }]
     mapDispatchToProps,
 )
 export default class Projects extends Component {
-    static contextTypes = {
-        router: PropTypes.object.isRequired
-    }
 
     static propTypes = {
         children: PropTypes.object,
@@ -67,6 +64,7 @@ export default class Projects extends Component {
         })
     }
 
+
     fetchDevices = async ()=>{
         const { sendError, firebase, auth, projects, dispatch, spotifyReducer} = this.props
         let user = await this.fetchUser()
@@ -80,34 +78,32 @@ export default class Projects extends Component {
             access_token: snapshotAccess.val(), 
             refresh_token: snapshotRefresh.val(), 
         }
-        const response = fetch('/devices',{
+        const response = await fetch('/devices',{
             headers: {
                 'Accept': 'application/json, text/plain, ',
                 'Content-Type': 'application/json'
             },
             method: "POST",
             body: JSON.stringify(body)  
-        }).then( response =>{
-            return response.json();
-        } ).then( data =>{
-            if(data.devices != undefined){
-                this.setState({devices: data.devices, loading: false})
-            }else if(data.msg === "no devices"){
-                sendError({
-                    title: 'Error',
-                    message: 'No Devices Found',
-                    position: 'tr',
-                    autoDismiss: 0,
-                    action: {
-                        label: 'Try Again?',
-                        callback: () => {
-                            this.fetchDevices();
-                        }
+        });
+        const data = await response.json();
+        if(data.devices != undefined){
+            this.setState({devices: data.devices, loading: false})
+        }else if(data.msg === "no devices"){
+            sendError({
+                title: 'Error',
+                message: 'No Devices Found',
+                position: 'tr',
+                autoDismiss: 0,
+                action: {
+                    label: 'Try Again?',
+                    callback: () => {
+                        this.fetchDevices();
                     }
-                })
-                this.setState({loading: false})
-            }
-        } )
+                }
+            })
+            this.setState({loading: false})
+        }
     }
 
     componentWillMount(){
@@ -141,7 +137,7 @@ export default class Projects extends Component {
 
         newProject['access_token'] = snapshotAccess.val();
         newProject['refresh_token'] = snapshotRefresh.val();
-        
+
         firebase
             .set(`projects/${newProject.name}`,newProject)
             .then(() => this.setState({ newProjectModal: false }))
@@ -181,7 +177,6 @@ export default class Projects extends Component {
             return (
                 <div className={classes.container}>
                     <h1> Open Spotify and Connect Some Devices </h1>        
-                    <LoadingSpinner />
                 </div>
             )
         }
@@ -190,14 +185,14 @@ export default class Projects extends Component {
         }
         return (
             <div className={classes.container}>
-                {newProjectModal && (
-                    <NewProjectDialog
-                        devices = {this.state.devices}
-                        open={newProjectModal}
-                        onSubmit={this.newSubmit}
-                        onRequestClose={() => this.toggleModal('newProject')}
-                    />
-                )}
+            {newProjectModal && (
+                <NewProjectDialog
+                devices = {this.state.devices}
+                open={newProjectModal}
+                onSubmit={this.newSubmit}
+                onRequestClose={() => this.toggleModal('newProject')}
+                />
+            )}
             <div className={classes.tiles}>
                 <NewProjectTile onClick={() => this.toggleModal('newProject')} />
                 {!isEmpty(projects) && 
@@ -209,6 +204,7 @@ export default class Projects extends Component {
                                     project={project}
                                     onCollabClick={this.collabClick}
                                     onDelete={() => this.deleteProject(key)}
+                                    hostSelect={ () => changeLocation(`/Host/Party/${key}`) }
                                     onSelect={() => changeLocation(`${LIST_PATH}/${key} `)}
                                     showDelete={this.getDeleteVisible(key)}
                                         />

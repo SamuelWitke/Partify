@@ -7,10 +7,10 @@ import DeleteIcon from 'material-ui/svg-icons/action/delete'
 import Settings from 'material-ui/svg-icons/action/settings'
 import classes from './ProjectTile.scss'
 
-const ProjectTile = ({ project, onSelect, onDelete, showDelete }) => (
+const ProjectTile = ({ hostSelect, project, onSelect, onDelete, showDelete }) => (
   <Paper className={classes.container}>
     <div className={classes.top}>
-      <span className={classes.name} onClick={() => onSelect(project)}>
+      <span className={classes.name} onClick={hostSelect}>
         {project.name}
       </span>
       {showDelete && onDelete ? (

@@ -39,37 +39,60 @@ export default class ProjectContainer extends Component {
         items: [],
         loading: true,
     }
-    async componentWillMount(){
-        const {sendInfo, firebase, profile, projectname} = this.props;
+    
+    getUserPlaylist = async () => {
+        const {firebase, profile, projectname} = this.props;
+
         const user = profile.displayName;
         const accessRef = firebase.database().ref(`projects/${projectname}/access_token`);
         const refreshRef = firebase.database().ref(`projects/${projectname}/refresh_token`);
         const snapshotAccess = await accessRef.once('value');
         const snapshotRefresh = await refreshRef.once('value');
+
         const body = {
             user: profile.displayName,
             name: projectname,
             access_token: snapshotAccess.val(),
             refresh_token: snapshotRefresh.val(),
         }
-
-        fetch("/user-playlist",{
+        const res = await(fetch("/user-playlist",{
             headers: {
                 'Accept': 'application/json, text/plain, */*',
                 'Content-Type': 'application/json'
             },
             method: "POST",
             body: JSON.stringify(body)
-        }).then( res =>{ return res.json()})
-            .then( val => {
-                this.setState({items : val.items, loading: false})
-                sendInfo({
-                       title: 'Your Playlist',
-                      message: 'User Playlist',
-                      position: 'tr',
-                })
+        }))
+        const val = await res.json()
+        return val;
+    }
 
+    async componentWillMount(){
+        const { sendInfo, sendError } = this.props;
+        const val = await this.getUserPlaylist();
+       if( val !== "Invalid access token" ) {
+            this.setState({items : val.items, loading: false})
+            sendInfo({
+            title: 'Your Playlist',
+            message: 'User Playlist',
+            position: 'tr',
             })
+       }else{
+             sendError({
+                title: 'Error',
+                message: 'Invalid access token',
+                position: 'tr',
+                autoDismiss: 0,
+                action: {
+                    label: 'Try Again?',
+                    callback: () => {
+                        this.getUserPlaylist();
+                    }
+                }
+            })
+            this.setState({loading: false})
+
+       }
     }
 
     submitPlaylist = async (item) =>{
@@ -102,8 +125,8 @@ export default class ProjectContainer extends Component {
                 changeLocation(`/Host/Party/${projectname}`)
                 sendSuccess({
                     title: 'Playlist Added To The Queue',
-                     message: 'Start Hosting',
-                     position: 'tr',
+                    message: 'Start Hosting',
+                    position: 'tr',
                 })
             })
     }
@@ -127,10 +150,12 @@ export default class ProjectContainer extends Component {
                     params={params}
                     onClick={this.onClick}
                 />
+                { items && 
                 <Grid 
                     handleTouchTap={this.submitPlaylist}
                     items = {items}
                 />
+                }
             </div>
         )
     }
