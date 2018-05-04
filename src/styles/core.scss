@@ -13,6 +13,8 @@
 
   html,
   body {
+          overflow:hidden;
+
     font-family: 'Roboto', 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     @include desktop {
       font-size: 15px;

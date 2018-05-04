@@ -1,89 +1,69 @@
 import Immutable from 'immutable';
 import PropTypes from 'prop-types';
-import styles from './SongsList.scss';
-import * as React from 'react';
+import classes from './SongsList.scss';
+import React from 'react';
 import { List, AutoSizer} from 'react-virtualized'
-import SongItem from '../SongItem'
+import SongItem from '../SongItem/index.js'
 
 
 export default class SongsList extends React.PureComponent {
-
-    constructor(props) {
-        super(props);
-        console.log(this.props.list)
-        this.state = {
-            listHeight: 300,
-            listRowHeight: 50,
-            overscanRowCount: 10,
-            rowCount: props.list.size,
-            scrollToIndex: undefined,
-            showScrollingPlaceholder: true,
-            useDynamicRowHeight: true,
-        };
-
+    componentWillReceiveProps(){
+        this.refs.forceUpdateGrid();
     }
-
     render() {
-        const {
-            listHeight,
-            listRowHeight,
-            overscanRowCount,
-            rowCount,
-            scrollToIndex,
-            showScrollingPlaceholder,
-            useDynamicRowHeight,
-        } = this.state;
-
         return (
-            <div>
-                <AutoSizer >
-                    {({dimensions}) => (
-                        <List
-                            width={ 300 }
-                            height = { 300 }
-                            rowHeight = { 30 }
-                            rowWidth = { 30 }
-                            rowRenderer={this._rowRenderer}
-                            rowStyle={ { alignItems: 'stretch' } }
-                            className={styles.List}
-                            height={listHeight}
-                            overscanRowCount={5}
-                            rowCount={rowCount}
-                        />
-                    )}
-                </AutoSizer>
+            <div className={classes.container} style={{ display: 'flex' }}>
+                <div style={{ flex: '1 1 auto' , height: '100vh'}}>
+                    <AutoSizer>
+                        { ({width, height}) => {
+                            return <List
+                                className={classes.List}
+                                ref={ref => this.refs = ref}
+                                rowCount={this.props.list.size}
+                                rowStyle={ { alignItems: 'stretch' } }
+                                width={800}
+                                height={height}
+                                rowHeight={500}
+                                rowRenderer={this._rowRenderer}
+                            />
+                        }}
+                    </AutoSizer>
+                </div>
             </div>
         );
     }
 
-    _getDatum = (index) => {
-        const {list} = this.props;
-        return list.get(index % list.size);
-    }
-
-    
     _rowRenderer=({index, isScrolling, key, style}) => {
-        const  { admin, list, upVote, downVote, onDelete } = this.props;
+        const  { active, admin, list, upVote, downVote, onDelete } = this.props;
         const row = list.get(index)
-        console.log(row)
+        const activeSong = row.song.uri === active
         return (
-            <div key={row.id} className={styles.row}> {JSON.stringify(row)}</div>
+            <div
+                className={classes.row}
+                key={key}
+                style={style}
+            >
+                <SongItem
+                    author={ row.author }
+                    disabledUp = {row.disabledUp}
+                    disabledDown = {row.disabledDown}
+                    song={row.song}
+                    name={row.song.name}
+                    votes={row.song.project.votes}
+                    visableDelete={row.visableDelete || admin}
+                    active={active}
+                    upVote={upVote}
+                    active = { activeSong }
+                    downVote = {downVote }
+                    onDeleteClick = {onDelete}
+                    id={row.id}
+                    img = { row.img }
+                />
+            </div>
         );
     }
 }
 /*
-                <SongItem
-                    author={ datum.author }
-                    disabledUp = {datum.disabledUp}
-                    disabledDown = {datum.disabledDown}
-                    song={datum.song}
-                    votes={datum.song.project.votes}
-                    visableDelete={datum.visableDelete || admin}
-                    active={datum.active}
-                    upVote={upVote}
-                    downVote = {downVote }
-                    onDeleteClick = {onDelete}
-                    id={datum.id}
-                />
-                */
+
+*/
 

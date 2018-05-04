@@ -23,13 +23,17 @@ if(process.env.REDISCLOUD_URL) {
     }
 }
 
-admin.database().ref('/kues').on("child_added", (snapshot) => {
-    let _exitActivJob;
+    let exitActivJob = {};
     let timeOutPlayer = {player: undefined};
 
+
+admin.database().ref('/kues').on("child_added", (snapshot) => {
     const projects = snapshot.val();
     const jobs = kue.createQueue(kueOptions);
     logger.info(projects)
+    console.log(exitActivJob,timeOutPlayer)
+    timeOutPlayer[`${projects}`] =  undefined;
+    exitActivJob[`${projects}`] = undefined;
 
     jobs.process(projects,1, async ( job, done ) => {
         const access_ref = await admin.database().ref(`projects/${job.data.project}/access_token`).once('value');
@@ -52,7 +56,7 @@ admin.database().ref('/kues').on("child_added", (snapshot) => {
             body:  dataString
         };
         //Store the job's done function in a global variable so we can access it from elsewhere.
-        _exitActivJob = () => {
+        exitActivJob[`${projects}`] = () => {
             done();
         };
 
@@ -66,10 +70,11 @@ admin.database().ref('/kues').on("child_added", (snapshot) => {
             request(options)
                 .then( async (response) => {
                     logger.info("Playing",job.data.title+5);
-                    timeOutPlayer.player = setTimeout( async () => {
+    timeOutPlayer[`${projects}`] = setTimeout( async () => {
                         done();
-                        _exitActivJob = undefined;
-                        timeOutPlayer.player = undefined;
+                        exitActivJob[`${projects}`] = undefined;
+                    timeOutPlayer[`${projects}`] =  undefined;
+ 
                         const del_ref = admin.database().ref(`projects/${job.data.project}/Songs/${job.data.key}`);
                         await del_ref.remove()
                         logger.info('song removed'+job.data.title);
@@ -80,7 +85,7 @@ admin.database().ref('/kues').on("child_added", (snapshot) => {
                     const del_ref = admin.database().ref(`projects/${job.data.project}/Songs/${job.data.key}`);
                     await del_ref.remove()
                     done();
-                    clearTimeout(timeOutPlayer.player);
+                    clearTimeout(timeOutPlayer[`${projects}`]);
                 })
             }catch( e ){
                 logger.error("ERROR in request",e) 
@@ -122,11 +127,11 @@ admin.database().ref('/kues').on("child_added", (snapshot) => {
         try{
             kue.Job.get(song.song.song_id, ( err, job ) => {
                 if(!err){
-                    if(job.state('active') && song.song.uri === active && _exitActivJob && timeOutPlayer.player){
-                        _exitActivJob();
-                        _exitActivJob = undefined;
-                        clearTimeout(timeOutPlayer.player);
-                        timeOutPlayer.player = undefined;
+                    if(job.state('active') && song.song.uri === active && exitActivJob[`${projects}`] && timeOutPlayer[`${projects}`]){
+                        exitActivJob[`${projects}`]();
+                        exitActivJob[`${projects}`]=undefined;
+                        clearTimeout(timeOutPlayer[`${projects}`]);
+                        timeOutPlayer[`${projects}`] = undefined
                     }
                     logger.info("Song",song.song.name,"removed",song.song.song_id)
                     job.remove();

@@ -40,6 +40,7 @@ const mapDispatchToProps = (dispatch)=> {
     {
         project:  firebase.data.projects ? firebase.data.projects[`${props.params.name}`] : "" , // lodash's get can also be used
         songs:  firebase.data.projects ? Immutable.Map(firebase.data.projects[`${props.params.name}`].Songs) : Immutable.Map() , // lodash's get can also be used
+        active: firebase.data.projects ? firebase.data.projects[`${props.params.name}`].active : "" ,
         auth: auth,
         name: props.params.name,
         profile,
@@ -58,27 +59,28 @@ export default class Lists extends Component {
 
 
     getItems = ({songs,params,uid,profile}) =>{
-        const items = map( songs.toJS(), (song, id)  => {
+        const items = Immutable.List(map( songs.toJS(), (song, id)  => {
             const disabledUp = typeof song.song.project.votedUpBy == 'object' ? Object.keys(song.song.project.votedUpBy).map( key => key).includes(uid)  : false;
             const disabledDown = typeof song.song.project.votedDownBy == 'object' ? Object.keys(song.song.project.votedDownBy).map( key => key).includes(uid)  : false;
             const visableDelete = song.song.project.submitedBy === uid  
-            const active = song.song.active ? true : false;
             const author = song.song.project.author;
             const img = song.song.album.images[0].url;
+            const votes = song.song.project.votes;
             return {
                 disabledUp,
                 disabledDown,
                 visableDelete,
-                active,
+                votes,
                 author,
                 img,
                 song: song.song,
                 id,
             }
-        })
-        return Immutable.List(items);
+        }))
+        return items.sort( (a,b) => a.votes - b.votes ).reverse();
     }
 
+        /*
     componentWillMount(){
         const items = this.getItems(this.props);
         this.setState({items: items}, () => {
@@ -95,7 +97,6 @@ export default class Lists extends Component {
             }); 
         }
     }
-        /*
     shouldComponentUpdate(nextProps){
         return !nextProps.songs.equals(this.props.songs) ? true : false;
     }
@@ -108,7 +109,7 @@ export default class Lists extends Component {
 
     upVote = async (songObj,id) => {
         const {sendError, sendInfo, firebase, uid}= this.props;
-        const song = songObj.song;
+        const song = songObj;
         try{
             let refVote = firebase.database().ref(`projects/${this.props.name}/Songs/${id}/song/project/votes`)
             let refBy = firebase.database().ref(`projects/${this.props.name}/Songs/${id}/song/project/votedUpBy/${uid}`).set(uid);
@@ -122,6 +123,7 @@ export default class Lists extends Component {
         }catch( e ){
             sendError({
                 title: 'Error Upvoting',
+                message: e.message,
                 position: 'tr',
             })
         }
@@ -181,16 +183,16 @@ export default class Lists extends Component {
 
 
     render() {
-        const {songs,project,params,uid,profile} = this.props;
+        const {active,songs,project,params,uid,profile} = this.props;
         //const songs = project ? project.Songs: null;
-        const { items } = this.state;
-        console.log("render",items,songs)
+        const  items  = this.getItems(this.props);
         return (
             <div> 
-                { items.size > 0 ? (
+                { items && items.size > 0 ? (
                 <div>
                 <SongsList 
                     admin={project.createdBy === profile.email}
+                    active = {active}
                     uid={uid}
                     onDelete={this.onDelete}
                     upVote={this.upVote}
