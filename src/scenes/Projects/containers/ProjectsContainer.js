@@ -27,7 +27,7 @@ const mapDispatchToProps = (dispatch)=> {
 
 const populates = [{ child: 'createdBy', root: 'users' }]
 
-@UserIsAuthenticated
+UserIsAuthenticated
 @firebaseConnect([
     { path: '/projects' }
     // 'projects#populate=owner:users' // string equivalent

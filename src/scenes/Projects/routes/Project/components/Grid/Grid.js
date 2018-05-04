@@ -26,23 +26,21 @@ const Grid= ({items, handleTouchTap}) => (
         cellHeight={200}
         padding={1}
     >
-
         {items.map((item) => (
-            <span
-                key={item.id}>
-            <GridTile
-                key={item.name}
-                title={item.name}
-                actionIcon={
-                    <Checkbox
-                        style={styles.checkbox}
-                        onCheck={ (e) => {handleTouchTap(item)}}
-                    />
-                }
-            >
-           <img src={item.images[0].url} />
-            </GridTile>
-        </span>
+            <span key={item.id}>
+                <GridTile
+                    key={item.name}
+                    title={item.name}
+                    actionIcon={
+                        <Checkbox
+                            style={styles.checkbox}
+                            onCheck={ (e) => {handleTouchTap(item)}}
+                        />
+                    }
+                >
+                    <img src={item.images[0].url} />
+                </GridTile>
+            </span>
         ))}
     </GridList>
 );

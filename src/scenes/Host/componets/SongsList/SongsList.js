@@ -1,69 +1,89 @@
-import React, {Component} from 'react'
-import PropTypes from 'prop-types'
-import { map } from 'lodash'
-import { compose, withHandlers } from 'recompose'
-import { List } from 'material-ui/List'
-import Paper from 'material-ui/Paper'
-import Subheader from 'material-ui/Subheader'
-import { spinnerWhileLoading } from 'utils/components'
+import Immutable from 'immutable';
+import PropTypes from 'prop-types';
+import styles from './SongsList.scss';
+import * as React from 'react';
+import { List, AutoSizer} from 'react-virtualized'
 import SongItem from '../SongItem'
-import classes from './SongsList.scss'
-import { connect } from 'react-redux'
-import {GridList, GridTile} from 'material-ui/GridList';
-import { firebaseConnect, getVal } from 'react-redux-firebase'
-import IconButton from 'material-ui/IconButton'
-import DeleteIcon from 'material-ui/svg-icons/action/delete'
 
-const styles = {
-    root: {
-        display: 'flex',
-        flexWrap: 'wrap',
-        justifyContent: 'space-around',
-    },
-    gridList: {
-        display: 'flex',
-        flexWrap: 'wrap',
-        width: 500,
-    },
-};
-const SongsList = ({onDelete,activeURI,upVote,downVote,songs,admin,auth,uid}) => (
-    <Paper>
-        <div className={classes.list}>
-            <div style={styles.root}>
-                <Subheader>Songs</Subheader>
-                <GridList
-                    cols={1}
-                    padding={1}
-                    cellHeight={200}
-                    style={styles.gridList}
-                >
-                    { map( songs, (song, id)  => {
-                        const disabledUp = typeof song.song.project.votedUpBy == 'object' ? Object.keys(song.song.project.votedUpBy).map( key => key).includes(uid)  : false;
-                        const disabledDown = typeof song.song.project.votedDownBy == 'object' ? Object.keys(song.song.project.votedDownBy).map( key => key).includes(uid)  : false;
-                        const visableDelete = song.song.project.submitedBy === uid  
-                        const active = song.song.uri === activeURI ? true : false;
-                        const author = song.song.project.author;
-                        return (
-                            <span key={id}>
-                                <SongItem
-                                    author={ author }
-                                    disabledUp = {disabledUp}
-                                    disabledDown = {disabledDown}
-                                    song={song.song}
-                                    votes={song.song.project.votes}
-                                    visableDelete={visableDelete || admin}
-                                    active={active}
-                                    upVote={upVote}
-                                    downVote = {downVote }
-                                    onDeleteClick = {onDelete}
-                                    id={id}
-                                />
-                            </span>
-                        )})}
-                    </GridList >
-                </div>
+
+export default class SongsList extends React.PureComponent {
+
+    constructor(props) {
+        super(props);
+        console.log(this.props.list)
+        this.state = {
+            listHeight: 300,
+            listRowHeight: 50,
+            overscanRowCount: 10,
+            rowCount: props.list.size,
+            scrollToIndex: undefined,
+            showScrollingPlaceholder: true,
+            useDynamicRowHeight: true,
+        };
+
+    }
+
+    render() {
+        const {
+            listHeight,
+            listRowHeight,
+            overscanRowCount,
+            rowCount,
+            scrollToIndex,
+            showScrollingPlaceholder,
+            useDynamicRowHeight,
+        } = this.state;
+
+        return (
+            <div>
+                <AutoSizer >
+                    {({dimensions}) => (
+                        <List
+                            width={ 300 }
+                            height = { 300 }
+                            rowHeight = { 30 }
+                            rowWidth = { 30 }
+                            rowRenderer={this._rowRenderer}
+                            rowStyle={ { alignItems: 'stretch' } }
+                            className={styles.List}
+                            height={listHeight}
+                            overscanRowCount={5}
+                            rowCount={rowCount}
+                        />
+                    )}
+                </AutoSizer>
             </div>
-        </Paper>
-)
-export default SongsList;
+        );
+    }
+
+    _getDatum = (index) => {
+        const {list} = this.props;
+        return list.get(index % list.size);
+    }
+
+    
+    _rowRenderer=({index, isScrolling, key, style}) => {
+        const  { admin, list, upVote, downVote, onDelete } = this.props;
+        const row = list.get(index)
+        console.log(row)
+        return (
+            <div key={row.id} className={styles.row}> {JSON.stringify(row)}</div>
+        );
+    }
+}
+/*
+                <SongItem
+                    author={ datum.author }
+                    disabledUp = {datum.disabledUp}
+                    disabledDown = {datum.disabledDown}
+                    song={datum.song}
+                    votes={datum.song.project.votes}
+                    visableDelete={datum.visableDelete || admin}
+                    active={datum.active}
+                    upVote={upVote}
+                    downVote = {downVote }
+                    onDeleteClick = {onDelete}
+                    id={datum.id}
+                />
+                */
 

@@ -9,6 +9,9 @@ import SongsList from '../../componets/SongsList/index.js'
 import { UserIsAuthenticated } from 'utils/router'
 import { success, error, warning, info, removeAll } from 'react-notification-system-redux';
 import { isEmpty } from 'react-redux-firebase'
+import { map } from 'lodash'
+import Immutable from 'immutable';
+
 
 const fixedbutton = {
     position: 'fixed',
@@ -36,7 +39,7 @@ const mapDispatchToProps = (dispatch)=> {
 @connect(({ firebase, firebase: { auth, profile },},props) => (
     {
         project:  firebase.data.projects ? firebase.data.projects[`${props.params.name}`] : "" , // lodash's get can also be used
-        active: firebase.data.projects ? firebase.data.projects[`${props.params.name}`].active : "" ,
+        songs:  firebase.data.projects ? Immutable.Map(firebase.data.projects[`${props.params.name}`].Songs) : Immutable.Map() , // lodash's get can also be used
         auth: auth,
         name: props.params.name,
         profile,
@@ -46,16 +49,70 @@ const mapDispatchToProps = (dispatch)=> {
 )
 
 export default class Lists extends Component {
+    constructor(props){
+        super(props);
+        this.state = {
+            items : this.getItems(this.props),
+        }
+    }
+
+
+    getItems = ({songs,params,uid,profile}) =>{
+        const items = map( songs.toJS(), (song, id)  => {
+            const disabledUp = typeof song.song.project.votedUpBy == 'object' ? Object.keys(song.song.project.votedUpBy).map( key => key).includes(uid)  : false;
+            const disabledDown = typeof song.song.project.votedDownBy == 'object' ? Object.keys(song.song.project.votedDownBy).map( key => key).includes(uid)  : false;
+            const visableDelete = song.song.project.submitedBy === uid  
+            const active = song.song.active ? true : false;
+            const author = song.song.project.author;
+            const img = song.song.album.images[0].url;
+            return {
+                disabledUp,
+                disabledDown,
+                visableDelete,
+                active,
+                author,
+                img,
+                song: song.song,
+                id,
+            }
+        })
+        return Immutable.List(items);
+    }
+
+    componentWillMount(){
+        const items = this.getItems(this.props);
+        this.setState({items: items}, () => {
+            console.log(this.state.items, 'items updated');
+        }); 
+    }
+
+    componentWillReceiveProps(oldProps){
+        if(!oldProps.songs.equals(this.props.songs)){
+            const items = this.getItems(this.props);
+            console.log("componentWillReceiveProps",items,this.props.songs)
+            this.setState({items: items}, () => {
+                console.log(this.state.items, 'componentWillReceiveProps updated');
+            }); 
+        }
+    }
+        /*
+    shouldComponentUpdate(nextProps){
+        return !nextProps.songs.equals(this.props.songs) ? true : false;
+    }
+    */
+
+
     onClick = e => {
         this.props.changeLocation(`Host/Songs/${this.props.params.name}`) 
     }
 
-    upVote = (song,id) => {
+    upVote = async (songObj,id) => {
         const {sendError, sendInfo, firebase, uid}= this.props;
+        const song = songObj.song;
         try{
             let refVote = firebase.database().ref(`projects/${this.props.name}/Songs/${id}/song/project/votes`)
             let refBy = firebase.database().ref(`projects/${this.props.name}/Songs/${id}/song/project/votedUpBy/${uid}`).set(uid);
-            refVote.transaction( (votes) => {
+            await refVote.transaction( (votes) => {
                 return (votes || 0) + 1;
             });
             sendInfo({
@@ -124,31 +181,33 @@ export default class Lists extends Component {
 
 
     render() {
-
-        const {project,params,uid,profile,active} = this.props;
-        const songs = project ? project.Songs: null;
+        const {songs,project,params,uid,profile} = this.props;
+        //const songs = project ? project.Songs: null;
+        const { items } = this.state;
+        console.log("render",items,songs)
         return (
             <div> 
-                { !isEmpty(songs) ? (
-                    <SongsList 
-                        uid={uid}
-                        activeURI={active}
-                        onDelete={this.onDelete}
-                        upVote={this.upVote}
-                        downVote={this.downVote}
-                        admin={project.createdBy === profile.email}
-                        name={params.name} 
-                        songs={songs} /> 
-                ) : (
-                    <div className={""}>Song Queue Empty</div>
-                )}
-                <FloatingActionButton 
-                    style={fixedbutton}
-                    secondary={true}
-                    onClick={this.onClick}>
-                    <ContentAdd />
-                </FloatingActionButton>
+                { items.size > 0 ? (
+                <div>
+                <SongsList 
+                    admin={project.createdBy === profile.email}
+                    uid={uid}
+                    onDelete={this.onDelete}
+                    upVote={this.upVote}
+                    downVote={this.downVote}
+                    name={params.name} 
+                    list={items} /> 
             </div>
+            ) : (
+                <div className={""}>Song Queue Empty</div>
+        )}
+        <FloatingActionButton 
+            style={fixedbutton}
+            secondary={true}
+            onClick={this.onClick}>
+            <ContentAdd />
+            </FloatingActionButton>
+        </div>
         );
     }
 }

@@ -86,12 +86,12 @@ export default class ProjectContainer extends Component {
                 action: {
                     label: 'Try Again?',
                     callback: () => {
+                        this.setState({loading: false})
                         this.getUserPlaylist();
                     }
                 }
             })
             this.setState({loading: false})
-
        }
     }
 

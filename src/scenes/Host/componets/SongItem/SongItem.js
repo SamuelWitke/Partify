@@ -16,7 +16,7 @@ import NotificationsIcon from 'material-ui/svg-icons/social/notifications';
 import ThumbUp from 'material-ui/svg-icons/action/thumb-up';
 import ThumbDown from 'material-ui/svg-icons/action/thumb-down';
 
-const SongItem = ({ author, active, disabledUp, disabledDown, song, visableDelete, id, votes, downVote, upVote, onDeleteClick }) => (
+const SongItem = ({ author, active, disabledUp, name, disabledDown, song,img, visableDelete, id, votes, downVote, upVote, onDeleteClick }) => (
     <GridTile
         key={id}
         title={
@@ -29,7 +29,7 @@ const SongItem = ({ author, active, disabledUp, disabledDown, song, visableDelet
                 </IconButton>
                 }
                 <Badge badgeContent={votes} primary={true}>
-                    <span className={classes.title}> {song.name} </span>
+                    <span className={classes.title}> {name} </span>
                 </Badge>
             </div>
         }
@@ -63,15 +63,7 @@ const SongItem = ({ author, active, disabledUp, disabledDown, song, visableDelet
         titlePosition="top"
         titleBackground={active ? "linear-gradient(to bottom,rgba(121,32,116,1) 0%, rgba(82,0,71,1) 0%, rgba(103,29,96,1) 100%": "linear-gradient(to bottom, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.3) 70%,rgba(0,0,0,0) 100%)"}
     >
-        <img style={classes.img} src={song.album.images[0].url} />
+        <img style={""} src={img} />
     </GridTile>
 )
-
-SongItem.propTypes = {
-    song: PropTypes.object.isRequired,
-    key: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    onDeleteClick: PropTypes.func,
-    onCompleteClick: PropTypes.func
-}
-
 export default SongItem; 
