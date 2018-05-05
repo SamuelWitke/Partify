@@ -19,68 +19,69 @@ import ThumbDown from 'material-ui/svg-icons/action/thumb-down';
 import FlatButton from 'material-ui/FlatButton';
 
 const SongItem = ({ author, active, disabledUp, name, disabledDown, song,img, visableDelete, id, votes, downVote, upVote, onDeleteClick }) => (
-    <Card>
-        <CardMedia
-            style={{
-                maxWidth: '25em',
-                maxHeight: '25em',
-                color: active ? "yellow" : "",
-            }}
-            overlay={<CardTitle title={
-                <Badge badgeContent={votes} primary={true}>
-                    <span
-                        style={{
-                            color: active ? "firebrick" : "",
+    <div style={{ margin: '0 auto'}}>
+        <Card>
+            <CardMedia
+                style={{
+                    maxWidth: '25em',
+                    maxHeight: '25em',
+                    color: active ? "yellow" : "",
+                }}
+                overlay={<CardTitle title={
+                    <Badge badgeContent={votes} primary={true}>
+                        <span
+                            style={{
+                                color: active ? "firebrick" : "",
 
-                        }}
-                    > {name} </span>
-            </Badge>
-            }
-            subtitle={"Submitted by "+author} 
-        />}
-    >
-        <img src={img} alt="" />
-    </CardMedia>
-    <CardActions>
-        <div style={{
-            display: 'flex',
-            flexDirection: 'row',
-        }}>
-            <Checkbox 
-                style={{width: 0}}
-                checkedIcon={<ThumbUp />}
-                uncheckedIcon={<ThumbUp />}
-                disabled={disabledUp || active}
-                checked={disabledUp || active}
-                onCheck={() => upVote(song, song._key || id)}/>
-            <Checkbox 
-                style={{width: 0}}
-                checkedIcon={<ThumbDown />}
-                uncheckedIcon={<ThumbDown />}
-                checked={disabledDown || active}
-                disabled={disabledDown || active}
-                onCheck={() => downVote(song, song._key || id)}/>
-            { visableDelete && 
+                            }}
+                        > {name} </span>
+                </Badge>
+                }
+                subtitle={"Submitted by "+author} 
+            />}
+        >
+            <img src={img} alt="" />
+        </CardMedia>
+        <CardActions>
+            <div style={{
+                display: 'flex',
+                flexDirection: 'row',
+            }}>
+                <Checkbox 
+                    style={{width: 0}}
+                    checkedIcon={<ThumbUp />}
+                    uncheckedIcon={<ThumbUp />}
+                    disabled={disabledUp || active}
+                    checked={disabledUp || active}
+                    onCheck={() => upVote(song, song._key || id)}/>
+                <Checkbox 
+                    style={{width: 0}}
+                    checkedIcon={<ThumbDown />}
+                    uncheckedIcon={<ThumbDown />}
+                    checked={disabledDown || active}
+                    disabled={disabledDown || active}
+                    onCheck={() => downVote(song, song._key || id)}/>
+                { visableDelete && 
 
-            <IconButton 
-                style={{width: 0,height: 0,padding: 0}}
-                tooltip="Delete" 
-                onClick={() => onDeleteClick(song, song._key || id)}
-            >
+                <IconButton 
+                    style={{width: 0,height: 0,padding: 0}}
+                    tooltip="Delete" 
+                    onClick={() => onDeleteClick(song, song._key || id)}
+                >
                     <DeleteIcon 
                         style={{width: 0}}
 
                     />
                 </IconButton>
-            }
-        </div>
-    </CardActions>
-
+                }
+            </div>
+        </CardActions>
     </Card>
+</div>
 );
 export default SongItem; 
 /*
-*    <Card>
+ *    <Card>
      <CardHeader 
         title={
             <div className={classes.container}>

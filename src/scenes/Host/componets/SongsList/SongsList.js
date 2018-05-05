@@ -21,7 +21,7 @@ export default class SongsList extends React.PureComponent {
                                 ref={ref => this.refs = ref}
                                 rowCount={this.props.list.size}
                                 rowStyle={ { alignItems: 'stretch' } }
-                                width={800}
+                                width={width}
                                 height={height}
                                 rowHeight={500}
                                 rowRenderer={this._rowRenderer}
