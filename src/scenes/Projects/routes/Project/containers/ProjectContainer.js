@@ -42,6 +42,7 @@ export default class ProjectContainer extends Component {
     
     getUserPlaylist = async () => {
         const {firebase, profile, projectname} = this.props;
+        const { sendInfo, sendError } = this.props;
 
         const user = profile.displayName;
         const accessRef = firebase.database().ref(`projects/${projectname}/access_token`);
@@ -64,35 +65,32 @@ export default class ProjectContainer extends Component {
             body: JSON.stringify(body)
         }))
         const val = await res.json()
-        return val;
-    }
-
-    async componentWillMount(){
-        const { sendInfo, sendError } = this.props;
-        const val = await this.getUserPlaylist();
-       if( val !== "Invalid access token" ) {
+if( val.items) {
             this.setState({items : val.items, loading: false})
             sendInfo({
             title: 'Your Playlist',
             message: 'User Playlist',
             position: 'tr',
             })
-       }else{
+       }if(val.msg){
+            this.setState({loading: true})
              sendError({
                 title: 'Error',
-                message: 'Invalid access token',
+                message: val.msg,
                 position: 'tr',
                 autoDismiss: 0,
                 action: {
                     label: 'Try Again?',
                     callback: () => {
-                        this.setState({loading: false})
-                        this.getUserPlaylist();
+                       this.getUserPlaylist();
                     }
                 }
             })
-            this.setState({loading: false})
        }
+    }
+
+    async componentWillMount(){
+       this.getUserPlaylist();
     }
 
     submitPlaylist = async (item) =>{
@@ -113,6 +111,7 @@ export default class ProjectContainer extends Component {
             access_token: snapshotAccess.val(),
             refresh_token: snapshotRefresh.val(),
         }
+        this.setState({loading: true})
         fetch("/submit-playlist",{
             headers: {
                 'Accept': 'application/json, text/plain, */*',
@@ -123,6 +122,7 @@ export default class ProjectContainer extends Component {
         }).then( res =>{ return res.status})
             .then( val => {
                 changeLocation(`/Host/Party/${projectname}`)
+                this.setState({loading: false})
                 sendSuccess({
                     title: 'Playlist Added To The Queue',
                     message: 'Start Hosting',

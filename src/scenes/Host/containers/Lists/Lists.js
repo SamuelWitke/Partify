@@ -80,14 +80,8 @@ export default class Lists extends Component {
         return items.sort( (a,b) => a.votes - b.votes ).reverse();
     }
 
-        /*
-    componentWillMount(){
-        const items = this.getItems(this.props);
-        this.setState({items: items}, () => {
-            console.log(this.state.items, 'items updated');
-        }); 
-    }
 
+        /*
     componentWillReceiveProps(oldProps){
         if(!oldProps.songs.equals(this.props.songs)){
             const items = this.getItems(this.props);
@@ -166,7 +160,7 @@ export default class Lists extends Component {
         try{
             let ref =  firebase.database().ref(`projects/${name}/Songs/${id}/`);
             ref.remove( e =>{
-                if( error ) throw Error(e.message)
+                if( e ) throw Error(e.message)
                 sendInfo({
                     title: 'Song '+song.name+' Deleted',
                     position: 'tr',

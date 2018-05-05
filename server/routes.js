@@ -98,6 +98,7 @@ router.post('/devices', (req,res) => {
                 refreshToken(refresh_token,name,true)
                     .then( res => logger.info(res))
                     .catch( e=>{ logger.error(e) });
+                res.json( {msg : body.error.message});
             }else{
                 refreshToken(refresh_token,name,true)
                     .then( res => logger.info(res))
@@ -206,13 +207,13 @@ router.post('/user-playlist', (req, res) => {
                 refreshToken(refresh_token,name,false)
                     .then( res => logger.info(res))
                     .catch( e=>{ logger.error(e) });
-                res.json(msg.error.message)
+                res.json({msg :msg.error.message})
             }
         }catch (e){
             refreshToken(refresh_token,name,false)
                 .then( res => logger.info(res))
                 .catch( e=>{ logger.error(e) });
-            res.json(e.msg)
+            res.json({msg :e.msg})
         }
     })
 })

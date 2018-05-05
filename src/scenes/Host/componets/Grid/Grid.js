@@ -4,6 +4,7 @@ import IconButton from 'material-ui/IconButton';
 import Subheader from 'material-ui/Subheader';
 import StarBorder from 'material-ui/svg-icons/toggle/star-border';
 import Checkbox from 'material-ui/Checkbox';
+import classes from './Grid.scss'
 
 const styles = {
     root: {
@@ -12,8 +13,8 @@ const styles = {
         justifyContent: 'space-around',
     },
     gridList: {
-        width: 500,
-        height: 450,
+        width: '50vh',
+        height: '70vh',
         overflowY: 'auto',
     },
 };
@@ -23,6 +24,8 @@ const Grid= ({tilesData, handleTouchTap}) => (
     <GridList
         cellHeight={180}
         cols={2}
+        style={styles.gridList}
+        className={classes.Grid}
         cellHeight={200}
         padding={1}
     >

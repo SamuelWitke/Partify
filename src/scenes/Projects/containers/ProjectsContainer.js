@@ -89,10 +89,10 @@ export default class Projects extends Component {
         const data = await response.json();
         if(data.devices != undefined){
             this.setState({devices: data.devices, loading: false})
-        }else if(data.msg === "no devices"){
+        }else if(data.msg){
             sendError({
                 title: 'Error',
-                message: 'No Devices Found',
+                message: data.msg,
                 position: 'tr',
                 autoDismiss: 0,
                 action: {
@@ -195,7 +195,7 @@ export default class Projects extends Component {
             )}
             <div className={classes.tiles}>
                 <NewProjectTile onClick={() => this.toggleModal('newProject')} />
-                {!isEmpty(projects) && 
+                { projects && !isEmpty(projects) && 
                         map(projects, (project, key) => (
                             <div>
                                 { auth.email === project.createdBy &&   

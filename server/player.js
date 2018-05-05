@@ -23,18 +23,13 @@ if(process.env.REDISCLOUD_URL) {
     }
 }
 
-    let exitActivJob = {};
-    let timeOutPlayer = {player: undefined};
-
+let exitActivJob = {};
+let timeOutPlayer = {};
 
 admin.database().ref('/kues').on("child_added", (snapshot) => {
     const projects = snapshot.val();
     const jobs = kue.createQueue(kueOptions);
     logger.info(projects)
-    console.log(exitActivJob,timeOutPlayer)
-    timeOutPlayer[`${projects}`] =  undefined;
-    exitActivJob[`${projects}`] = undefined;
-
     jobs.process(projects,1, async ( job, done ) => {
         const access_ref = await admin.database().ref(`projects/${job.data.project}/access_token`).once('value');
         await admin.database().ref(`projects/${job.data.project}/active/`).set(job.data.uri)
@@ -62,42 +57,40 @@ admin.database().ref('/kues').on("child_added", (snapshot) => {
 
         const song_ref = admin.database().ref(`projects/${job.data.project}/Songs/${job.data.key}`);
         const songSnap = await song_ref.once('value');
-
         const active = await admin.database().ref(`projects/${job.data.project}/active/`).once('value')
 
         if(songSnap.exists()&&active.val() === job.data.uri){
             try{
-            request(options)
-                .then( async (response) => {
-                    logger.info("Playing",job.data.title+5);
-    timeOutPlayer[`${projects}`] = setTimeout( async () => {
-                        done();
-                        exitActivJob[`${projects}`] = undefined;
-                    timeOutPlayer[`${projects}`] =  undefined;
- 
+                request(options)
+                    .then( async (response) => {
+                        logger.info("Playing",job.data.title+5);
+                        timeOutPlayer[`${projects}`] = setTimeout( async () => {
+                            done();
+                            exitActivJob[`${projects}`] = undefined;
+                            timeOutPlayer[`${projects}`] =  undefined;
+                            const del_ref = admin.database().ref(`projects/${job.data.project}/Songs/${job.data.key}`);
+                            await del_ref.remove();
+                            logger.info('song removed'+job.data.title);
+                        }, job.data.time)
+                    }).catch( async e => {
+                        logger.error("ERROR in request",e) 
+                        const res = await refreshToken(refresh_token,job.data.project,false)
                         const del_ref = admin.database().ref(`projects/${job.data.project}/Songs/${job.data.key}`);
                         await del_ref.remove()
-                        logger.info('song removed'+job.data.title);
-                    }, job.data.time)
-                }).catch( async e => {
-                    logger.error("ERROR in request",e) 
-                    const res = await refreshToken(refresh_token,job.data.project,false)
-                    const del_ref = admin.database().ref(`projects/${job.data.project}/Songs/${job.data.key}`);
-                    await del_ref.remove()
-                    done();
-                    clearTimeout(timeOutPlayer[`${projects}`]);
-                })
+                        done();
+                        clearTimeout(timeOutPlayer[`${projects}`]);
+                    })
             }catch( e ){
                 logger.error("ERROR in request",e) 
-                    const res = await refreshToken(refresh_token,job.data.project,false)
-                    const del_ref = admin.database().ref(`projects/${job.data.project}/Songs/${job.data.key}`);
-                    await del_ref.remove()
-                    done();
+                const res = await refreshToken(refresh_token,job.data.project,false)
+                const del_ref = admin.database().ref(`projects/${job.data.project}/Songs/${job.data.key}`);
+                await del_ref.remove()
+                done();
             }
         }else{
-           const del_ref = admin.database().ref(`projects/${job.data.project}/Songs/${job.data.key}`);
-           await del_ref.remove()
-           done();
+            const del_ref = admin.database().ref(`projects/${job.data.project}/Songs/${job.data.key}`);
+            await del_ref.remove()
+            done();
         }
     })
 
@@ -135,14 +128,21 @@ admin.database().ref('/kues').on("child_added", (snapshot) => {
                     }
                     logger.info("Song",song.song.name,"removed",song.song.song_id)
                     job.remove();
-                }else {
-                    logger.error('Kue Removal Error')
-                }
+                }else {logger.error('Kue Removal Error')}
             })
-        }catch( e ){
-            logger.error('Child removed',e)
-        }
+        }catch(e){logger.error('Child removed',e)}
     })
+});
+admin.database().ref('/kues').once("child_removed", (snapshot) => {
+    try{
+        const projects = snapshot.val();
+        if(timeOutPlayer[`${projects}`]){
+            clearTimeout(timeOutPlayer[`${projects}`]);
+        }
+        timeOutPlayer[`${projects}`] = undefined
+    }catch(e){
+        logger.error(e.message);
+    }
 });
 
 module.exports = admin;
