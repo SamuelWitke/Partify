@@ -29,7 +29,7 @@ Get Api keys for Spotify and firebase
 ```
 
 ## Accepting Pull Requests 
-* Add and issue and fork the repo
+* Add an issue and fork the repo [Here For More Info On Contributing](https://gist.github.com/MarcDiethelm/7303312)
 
 #### Possible due to
 #### react-redux-firebase https://github.com/prescottprue/react-redux-firebase
