@@ -37,5 +37,5 @@ Get Api keys for Spotify and firebase
 #### Spotify API https://beta.developer.spotify.com/documentation/web-api/
 
 ### Can I Charge For This Product ?
-#### Unforutenly No Due To [Terms](https://beta.developer.spotify.com/terms/)
+#### Unfortunately No Due To [Terms](https://beta.developer.spotify.com/terms/)
  ```...commercial uses are not permitted for Streaming SDAs...``` 
