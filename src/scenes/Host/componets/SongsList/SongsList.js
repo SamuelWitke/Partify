@@ -6,7 +6,10 @@ import { List, AutoSizer} from 'react-virtualized'
 import SongItem from '../SongItem/index.js'
 
 
-export default class SongsList extends React.PureComponent {
+export default class SongsList extends React.Component {
+      constructor(props) {
+        super(props);
+      }
     componentWillReceiveProps(){
         this.refs.forceUpdateGrid();
     }

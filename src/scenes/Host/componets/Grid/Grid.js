@@ -13,14 +13,15 @@ const styles = {
         justifyContent: 'space-around',
     },
     gridList: {
-        width: '50vh',
-        height: '70vh',
+        width: '90%',
+        height: '800px',
         overflowY: 'auto',
     },
 };
 
 
 const Grid= ({tilesData, handleTouchTap}) => (
+      <div style={styles.root}>
     <GridList
         cellHeight={180}
         cols={2}
@@ -48,5 +49,6 @@ const Grid= ({tilesData, handleTouchTap}) => (
         </span>
         ))}
     </GridList>
+    </div>
 );
 export default Grid;

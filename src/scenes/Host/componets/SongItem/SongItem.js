@@ -25,9 +25,9 @@ const SongItem = ({ author, active, disabledUp, name, disabledDown, song,img, vi
                 style={{
                     maxWidth: '25em',
                     maxHeight: '25em',
-                    color: active ? "yellow" : "",
                 }}
-                overlay={<CardTitle title={
+                overlay={
+                    <CardTitle title={
                     <Badge badgeContent={votes} primary={true}>
                         <span
                             style={{
@@ -48,14 +48,16 @@ const SongItem = ({ author, active, disabledUp, name, disabledDown, song,img, vi
                 flexDirection: 'row',
             }}>
                 <Checkbox 
-                    style={{width: 0}}
+                    style={{width: 50}}
+                    iconStyle={{width: 30, height: 30}}
                     checkedIcon={<ThumbUp />}
                     uncheckedIcon={<ThumbUp />}
                     disabled={disabledUp || active}
                     checked={disabledUp || active}
                     onCheck={() => upVote(song, song._key || id)}/>
                 <Checkbox 
-                    style={{width: 0}}
+                    style={{width: 50}}
+                    iconStyle={{width: 30, height: 30}}
                     checkedIcon={<ThumbDown />}
                     uncheckedIcon={<ThumbDown />}
                     checked={disabledDown || active}
@@ -65,8 +67,8 @@ const SongItem = ({ author, active, disabledUp, name, disabledDown, song,img, vi
 
                 <IconButton 
                     style={{width: 0,height: 0,padding: 0}}
-                    tooltip="Delete" 
                     onClick={() => onDeleteClick(song, song._key || id)}
+                    iconStyle={{width: 30, height: 30}}
                 >
                     <DeleteIcon 
                         style={{width: 0}}
