@@ -180,7 +180,6 @@ export default class Lists extends Component {
         const {active,songs,project,params,uid,profile} = this.props;
         //const songs = project ? project.Songs: null;
         const  items  = this.getItems(this.props);
-        console.log(items)
         return (
             <div> 
                 { items && items.size > 0 ? (

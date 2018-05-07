@@ -10,7 +10,7 @@ export const Project = ({ projects, params: { projectname }, onClick }) => (
 			{projects.name ? (
 				<div>
 					<h2>Project Container</h2>
-					<pre>{JSON.stringify(projects.name, null, 2)}</pre>
+					<h3>{JSON.stringify(projects.name, null, 2)}</h3>
 				</div>
 				) : (
 					<div className={classes.empty}>
