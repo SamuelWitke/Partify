@@ -3,16 +3,18 @@
   @import 'device-sizes';
   @import 'standard-classes';
   @import '~normalize.css/normalize';
+
   @import url(https://fonts.googleapis.com/css?family=Roboto:300,400,100,500,900);
 
   // Some best-practice CSS that's useful for most apps
   // Just remove them if they're not what you want
   html {
-	background: #201f21;
+	background: #201f21 !important;
   }
 
   html,
   body {
+	background: #201f21 !important;
     font-family: 'Roboto', 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     @include desktop {
       font-size: 15px;

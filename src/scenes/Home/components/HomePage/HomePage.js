@@ -5,13 +5,15 @@ import { compose, withHandlers } from 'recompose'
 import { withNotifications } from 'modules/notification'
 import classes from './HomePage.scss'
 import Connect from '../Connect/Connect.js'
-import Party from '../../../../static/20151017_000009.jpg'
 import {push} from 'react-router-redux'
 import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card';
 import { firebaseConnect, populate } from 'react-redux-firebase'
 import { success, error, warning, info, removeAll } from 'react-notification-system-redux';
 import { setHost } from '../../../../store/host.js';
 import Paper from 'material-ui/Paper';
+import { Container, Row, Col } from 'reactstrap';
+
+
 
 
 const mapDispatchToProps = (dispatch)=> {
@@ -56,10 +58,10 @@ const enhance = compose(
 )
 
 const Home = ({ addNew, onSubmitFail }) => (
+            <Col lg={12} md={12} sm={12} xs={12}>
         <div className={classes.HomePage}>
         <Card className={classes.card}>
-            <CardMedia  className={""} overlay={<CardTitle title="Connect or Host" subtitle="A local Spotify Party" />} >
-            </CardMedia>
+            <CardMedia  className={"img-fluid"} overlay={<CardTitle title="Connect or Host" subtitle="A local Spotify Party" />} />
             <CardText className={classes.info}>
                 <Connect
                     disabled={false}
@@ -69,6 +71,7 @@ const Home = ({ addNew, onSubmitFail }) => (
             </CardText>
         </Card>
     </div>
+</Col>
 )
 
 Home.propTypes = {

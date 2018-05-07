@@ -1,7 +1,7 @@
 @import 'base';
 .container {
-    @extend .flex-column-center;
-    padding-top: 10em;
+   // @extend .flex-column-center;
+    //padding-top: 10em;
 }
 .info {
     filter: alpha(opacity=60);
@@ -27,22 +27,21 @@
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-
-    width: %100;
-    height: 750px;
+    
+    height: 850px;
     background-size: cover;
     //background-image: url('../../../../static/20151017_000009.jpg');
     // Free image available 
     background-image: url('https://visualhunt.com/photos/7/sparklers-manly-personable.jpg?s=l');
-    position: relative;
-    padding-right: 15px;
-    padding-left: 15px;
-    margin-right: auto;
-    margin-left: auto;
+}
+@media (min-width: 250px) {
+    .HomePage {
+        width: 250px;
+    }
 }
 @media (min-width: 500px) {
     .HomePage {
-        width: 400px;
+        width: 500px;
     }
 }
 
