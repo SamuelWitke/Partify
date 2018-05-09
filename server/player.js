@@ -144,9 +144,11 @@ admin.database().ref('/kues').once("child_removed", (snapshot) => {
         const projects = snapshot.val();
         if(exitActivJob[`${projects}`]){
             exitActivJob[`${projects}`]()
+            exitActivJob[`${projects}`]=undefined;
         }
         if(timeOutPlayer[`${projects}`]){
             clearTimeout(timeOutPlayer[`${projects}`]);
+            timeOutPlayer[`${projects}`] = undefined
         }
     }catch(e){
         logger.error(e.message);
