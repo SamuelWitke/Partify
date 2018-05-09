@@ -19,7 +19,9 @@ const ActiveSong = ({votes, activeSong, visableActive, onDelete}) => (
                         <CardActions>
                             { visableActive &&
                             <IconButton
-                                iconStyle={{width: 30, height: 30}}
+                                iconStyle={{
+                                    width: '10vh', 
+                                    height: '10vh'}}
                             >
                                 <DeleteIcon
                                     style={{width: 0}}
