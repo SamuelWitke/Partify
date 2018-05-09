@@ -197,7 +197,7 @@ export default class Projects extends Component {
                 <NewProjectTile onClick={() => this.toggleModal('newProject')} />
                 { projects && !isEmpty(projects) && 
                         map(projects, (project, key) => (
-                            <div>
+                            <div key={key}>
                                 { auth.email === project.createdBy &&   
                                 <ProjectTile
                                     key={`${key}-Collab-${key}`}

@@ -5,7 +5,6 @@ import React from 'react';
 import { List, AutoSizer} from 'react-virtualized'
 import SongItem from '../SongItem/index.js'
 
-
 export default class SongsList extends React.Component {
       constructor(props) {
         super(props);
@@ -53,7 +52,7 @@ export default class SongsList extends React.Component {
                     song={row.song}
                     name={row.song.name}
                     votes={row.song.project.votes}
-                    visableDelete={row.visableDelete || admin}
+                    visableDelete={ admin || row.visableDelete}
                     active={active}
                     upVote={upVote}
                     active = { activeSong }

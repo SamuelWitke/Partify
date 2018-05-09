@@ -14,6 +14,7 @@
     "run:dev": "cross-env NODE_ENV=development nodemon build/scripts/start",
     "start": "NODE_ENV=production node build/scripts/start",
     "heroku-postbuild": "npm run build",
+    "commit": "./node_modules/.bin/git-cz",
     "lint": "eslint .",
     "lint:fix": "npm run lint -- --fix",
     "storybook": "start-storybook -p 6006",
@@ -129,6 +130,13 @@
     "@storybook/addon-actions": "^3.4.3",
     "@storybook/addon-links": "^3.4.3",
     "@storybook/addons": "^3.4.3",
-    "@storybook/react": "^3.4.3"
+    "@storybook/react": "^3.4.3",
+    "commitizen": "^2.9.6",
+    "cz-conventional-changelog": "^2.1.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }

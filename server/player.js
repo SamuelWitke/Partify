@@ -111,7 +111,7 @@ admin.database().ref('/kues').on("child_added", (snapshot) => {
             });
         }catch(e){logger.error(e.message)}
     })
-
+try{
     ref.on("child_removed", async (snapshot) => {
         let song = snapshot.val()
         let ref = admin.database().ref(`/projects/${projects}/active`);
@@ -119,19 +119,25 @@ admin.database().ref('/kues').on("child_added", (snapshot) => {
         const active = snapshotActive.val();
         try{
             kue.Job.get(song.song.song_id, ( err, job ) => {
-                if(!err){
-                    if(job.state('active') && song.song.uri === active && exitActivJob[`${projects}`] && timeOutPlayer[`${projects}`]){
-                        exitActivJob[`${projects}`]();
-                        exitActivJob[`${projects}`]=undefined;
-                        clearTimeout(timeOutPlayer[`${projects}`]);
-                        timeOutPlayer[`${projects}`] = undefined
+                try{
+                    if(!err){
+                        if(job.state('active') && song.song.uri === active && exitActivJob[`${projects}`] && timeOutPlayer[`${projects}`]){
+                            exitActivJob[`${projects}`]();
+                            exitActivJob[`${projects}`]=undefined;
+                            clearTimeout(timeOutPlayer[`${projects}`]);
+                            timeOutPlayer[`${projects}`] = undefined
+                        }
+                        logger.info("Song",song.song.name,"removed",song.song.song_id)
+                        job.remove();
+
                     }
-                    logger.info("Song",song.song.name,"removed",song.song.song_id)
-                    job.remove();
-                }else {logger.error('Kue Removal Error')}
+                }catch(e) {logger.error('Kue Removal Error')}
             })
         }catch(e){logger.error('Child removed',e)}
     })
+    } catch(e) {
+        logger.error("child_removed error"+e.message)
+    }
 });
 admin.database().ref('/kues').once("child_removed", (snapshot) => {
     try{

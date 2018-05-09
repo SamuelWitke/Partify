@@ -49,12 +49,12 @@ class CunyTech extends Component {
                     </Col>
                     <Col lg={3} md={3} sm={3} xs={3} >
                         <a href="https://cunytechprep.nyc/">
-                            <CardImg classname="img-responsive img-circle center-block" style={{maxhight: '15em', maxwidth: '15em'}} src={TechPrep} alt={"logo"}/> 
+                            <CardImg className="img-responsive img-circle center-block" style={{maxhight: '15em', maxwidth: '15em'}} src={TechPrep} alt={"logo"}/> 
                         </a>
                     </Col>
                     <Col lg={3} md={3} sm={3} xs={3} >
                         <a href="http://www.techtalentpipeline.nyc/">
-                            <CardImg classname="img-responsive img-circle center-block" style={{maxhight: '15em', maxwidth: '15em'}} src={TTP} alt={"logo"}/> 
+                            <CardImg className="img-responsive img-circle center-block" style={{maxhight: '15em', maxwidth: '15em'}} src={TTP} alt={"logo"}/> 
                         </a>
                     </Col>
                 </Row>
