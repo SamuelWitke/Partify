@@ -12,9 +12,8 @@ import { success, error, warning, info, removeAll } from 'react-notification-sys
 import { setHost } from '../../../../store/host.js';
 import Paper from 'material-ui/Paper';
 import { Container, Row, Col } from 'reactstrap';
-
-
-
+import Logo from 'static/LOGO PARTIFY 1.png'
+import { CardImg } from 'reactstrap'
 
 const mapDispatchToProps = (dispatch)=> {
     return({
@@ -58,10 +57,18 @@ const enhance = compose(
 )
 
 const Home = ({ addNew, onSubmitFail }) => (
-            <Col lg={12} md={12} sm={12} xs={12}>
+    <Container>
         <div className={classes.HomePage}>
-        <Card className={classes.card}>
-            <CardMedia  className={"img-fluid"} overlay={<CardTitle title="Connect or Host" subtitle="A local Spotify Party" />} />
+            <Card className={classes.card}>
+                <CardMedia  
+                    className={"img-fluid"} 
+                    overlay={
+                        <CardTitle title={
+                            <Container>
+                                <CardImg top height="5%" width="5%" src={Logo} alt="Card image cap" />
+                            </Container>
+                        }
+                    />} />
             <CardText className={classes.info}>
                 <Connect
                     disabled={false}
@@ -71,7 +78,7 @@ const Home = ({ addNew, onSubmitFail }) => (
             </CardText>
         </Card>
     </div>
-</Col>
+    </Container>
 )
 
 Home.propTypes = {

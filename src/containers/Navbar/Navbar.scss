@@ -16,9 +16,6 @@
   @extend .flex-row;
   align-items: center;
   margin-top: 0px !important;
-  @include mobile {
-    justify-content: flex-end;
-  }
 }
 .wrapper {
   @extend .flex-row;

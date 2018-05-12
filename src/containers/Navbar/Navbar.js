@@ -11,9 +11,14 @@ import Avatar from 'material-ui/Avatar'
 import { connect } from 'react-redux'
 import { firebaseConnect, isLoaded, isEmpty } from 'react-redux-firebase'
 import { LIST_PATH, ACCOUNT_PATH, LOGIN_PATH, SIGNUP_PATH } from 'constants'
-import defaultUserImage from 'static/User.png'
 import classes from './Navbar.scss'
 import SvgIcon from 'material-ui/SvgIcon';
+import Logo from 'static/LOGO PARTIFY 11.png';
+import defaultUserImage1 from 'static/user1.png'
+import defaultUserImage2 from 'static/user4.png'
+//import defaultUserImage from 'static/User.png'
+
+
 const HomeIcon = (props) => (
     <SvgIcon {...props}>
         <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9h-4v4h-2v-4H9V9h4V5h2v4h4v2z" />
@@ -72,8 +77,11 @@ export default class Navbar extends Component {
                             src={
                                 profile && profile.avatarUrl
                                 ? profile.avatarUrl
-                                : defaultUserImage
+                                :  Math.random() >= 0.5 ? 
+                                  defaultUserImage1
+                                : defaultUserImage2
                             }
+
                         />
                     </div>
                     <div className={classes['avatar-text']}>
@@ -115,12 +123,12 @@ export default class Navbar extends Component {
                 title={
                     <div>
                         <Link to={'/'} className={classes.brand}>
-                            Partify 
+                            <img src={Logo} style={{hight: 80, width: 80}}/>
                         </Link>
                         { auth.email &&
-                                <Link to={ LIST_PATH } style={{paddingLeft: 20}}>
-                                    <HomeIcon />
-                                </Link>
+                        <Link to={ LIST_PATH } style={{paddingLeft: 20}}>
+                            <HomeIcon />
+                        </Link>
 
                         }
                     </div>

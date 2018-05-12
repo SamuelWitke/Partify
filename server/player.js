@@ -140,4 +140,10 @@ try{
     }
 });
 
+admin.database().ref('/kues').once("child_removed", (snapshot) => {
+    const projects = snapshot.val();
+    clearTimeout(timeOutPlayer[`${projects}`]);
+    timeOutPlayer[`${projects}`] = undefined
+});
+
 module.exports = admin;
