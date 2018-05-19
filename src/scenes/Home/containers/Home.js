@@ -1,25 +1,35 @@
 import React from 'react'
-import HomePage from '../components/HomePage/HomePage.js'
 import CunyTech from '../components/CUNY-TECH-INFO/CunyTech.js'
-import { Container, Row, Col } from 'reactstrap';
+import HomePage from '../components/HomePage/HomePage.js'
 import About from '../components/About/About.js';
+import Grid from '@material-ui/core/Grid';
+import Paper from '@material-ui/core/Paper';
 
-const style = {
-    float: 'none',
-    margin: '0 auto',
-}
+const styles = theme => ({
+	root: {
+		flexGrow: 1,
+		},
+	paper: {
+		padding: theme.spacing.unit * 2,
+		textAlign: 'center',
+		color: theme.palette.text.secondary,
+		},
+});
+
 
 const Home = () => (
-    <Container>
-        <Row style={style}>
-            <HomePage />
-            <Col style={{paddingTop: 100, float: 'none', margin: '0 auto'}} lg={10} md={10} sm={10} xs={10}>
-                <About />
-            </Col>
-            <Col style={{paddingTop: 100, float: 'none', margin: '0 auto'}} lg={10} md={10} sm={10} xs={10}>
-                <CunyTech />
-            </Col>
-        </Row>
-    </Container>
-)
+	<Grid container spacing={24}>
+		<Grid item xs={12}>
+			<Paper className={styles.paper}>
+				<HomePage />
+			</Paper>
+		</Grid>
+		<Grid item xs={12} sm={12}>
+			 <About /> 
+		</Grid>
+		<Grid item xs={12} sm={12}>
+			<CunyTech /> 
+		</Grid>
+	</Grid>
+	)
 export default Home;
