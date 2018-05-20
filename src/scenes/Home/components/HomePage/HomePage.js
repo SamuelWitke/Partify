@@ -25,9 +25,9 @@ const enhance = compose(
 	connect(
 		({ firebase, firebase: { auth }}) => ({
 			uid: auth.uid,
-		}),
+			}),
 		mapDispatchToProps
-	),
+		),
 	withHandlers({
 		addNew: props => async Host=>{
 			const {sendError, changeLocation, firebase, uid} = props;
@@ -38,19 +38,19 @@ const enhance = compose(
 				if(value != undefined){
 					if(uid == undefined){
 						firebase.auth().signInAnonymously()
-					}
+						}
 					changeLocation(`Host/Party/${value.name}`)
-				}else 
+					}else 
 					throw new Error("Invalid Host Code")
-			}catch(e) {
-				sendError({
-					title: 'Error',
-					message: 'Invalid Host Code',
-					position: 'tr',
-				});
-				console.error(e.message)
-			}
-		},
+				}catch(e) {
+					sendError({
+						title: 'Error',
+						message: 'Invalid Host Code',
+						position: 'tr',
+						});
+					console.error(e.message)
+					}
+			},
 	})
 )
 
@@ -61,18 +61,18 @@ const HomePage = ({ addNew, onSubmitFail }) => (
 				className={"img-fluid"} 
 				overlay={
 					<CardTitle title={
-							<img top height="55%" width="55%" src={Logo} alt="Card image cap" />
-					}
-				/>} />
-		<CardText className={classes.info}>
-			<Connect
-				disabled={false}
-				onSubmit={addNew}
-			/>
-			They wanna hear it! Partify lets your guests control the music at home or wherever you are.
-		</CardText>
-	</Card>
-</div>
+						<img top height="55%" width="55%" src={Logo} alt="Card image cap" />
+						}
+					/>} />
+			<CardText className={classes.info}>
+				<Connect
+					disabled={false}
+					onSubmit={addNew}
+				/>
+				They wanna hear it! Partify lets your guests control the music at home or wherever you are.
+			</CardText>
+		</Card>
+	</div>
 )
 
 HomePage.propTypes = {

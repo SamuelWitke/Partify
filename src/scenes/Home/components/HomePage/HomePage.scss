@@ -27,46 +27,9 @@
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-    
-    height: 850px;
+		height: 850px;
     background-size: cover;
     //background-image: url('../../../../static/20151017_000009.jpg');
     // Free image available 
     background-image: url('https://visualhunt.com/photos/7/sparklers-manly-personable.jpg?s=l');
-}
-@media (min-width: 300px) {
-    .HomePage {
-        width: 300px;
-    }
-}
-@media (min-width: 500px) {
-    .HomePage {
-        width: 500px;
-    }
-}
-
-@media (min-width: 768px) {
-    .HomePage {
-        width: 750px;
-    }
-}
-@media (min-width: 768px) {
-    .HomePage {
-        width: 750px;
-    }
-}
-@media (min-width: 768px) {
-    .HomePage {
-        width: 750px;
-    }
-}
-@media (min-width: 992px) {
-    .HomePage {
-        width: 970px;
-    }
-}
-@media (min-width: 1200px) {
-    .HomePage {
-        width: 1170px;
-    }
 }

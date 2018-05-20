@@ -16,7 +16,6 @@ const styles = theme => ({
 		},
 });
 
-
 const Home = () => (
 	<Grid container spacing={24}>
 		<Grid item xs={12}>

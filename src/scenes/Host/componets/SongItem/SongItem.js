@@ -6,7 +6,6 @@ import Checkbox from 'material-ui/Checkbox'
 import Delete from 'material-ui/svg-icons/action/delete'
 import { isObject } from 'lodash'
 import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card';
-
 import IconButton from 'material-ui/IconButton';
 import StarBorder from 'material-ui/svg-icons/toggle/star-border';
 import ActionFavorite from 'material-ui/svg-icons/action/favorite';
