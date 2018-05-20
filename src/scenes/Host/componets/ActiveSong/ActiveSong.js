@@ -4,6 +4,8 @@ import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'mat
 import FlatButton from 'material-ui/FlatButton';
 import IconButton from 'material-ui/IconButton';
 import DeleteIcon from 'material-ui/svg-icons/action/delete'
+import Badge from 'material-ui/Badge';
+
 
 const ActiveSong = ({votes, activeSong, visableActive, onDelete}) => (
 	<Paper>
@@ -12,7 +14,7 @@ const ActiveSong = ({votes, activeSong, visableActive, onDelete}) => (
 				overlay={
 					<CardTitle title={
 						<div>
-							<h1>Votes Earned <Badge color="secondary">{votes}</Badge></h1>
+							<h1><Badge primary={true} badgeContent={votes}>Votes Earned</Badge></h1>
 							{activeSong.song.name} by {activeSong.song.artists.map( artist =>  artist.name  )}
 							<CardActions>
 								{ visableActive &&

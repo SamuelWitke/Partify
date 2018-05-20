@@ -17,99 +17,78 @@ import ThumbUp from 'material-ui/svg-icons/action/thumb-up';
 import ThumbDown from 'material-ui/svg-icons/action/thumb-down';
 import FlatButton from 'material-ui/FlatButton';
 
-const SongItem = ({ author, active, disabledUp, name, disabledDown, song,img, visableDelete, id, votes, downVote, upVote, onDeleteClick }) => (
-    <div style={{ margin: '0 auto'}}>
-        <Card>
-            <CardMedia
-                style={{
-                    maxWidth: '25em',
-                    maxHeight: '25em',
-                }}
-                overlay={
-                    <CardTitle title={
-                    <Badge badgeContent={votes} primary={true}>
-                        <span
-                            style={{
-                                color: active ? "firebrick" : "",
-
-                            }}
-                        > {name} </span>
-                </Badge>
-                }
-                subtitle={"Submitted by "+author} 
-            />}
-        >
-            <img src={img} alt="" />
-        </CardMedia>
-        <CardActions>
-            <div style={{
-                display: 'flex',
-                flexDirection: 'row',
-            }}>
-                <Checkbox 
-                    style={{width: 50}}
-                    iconStyle={{width: 30, height: 30}}
-                    checkedIcon={<ThumbUp />}
-                    uncheckedIcon={<ThumbUp />}
-                    disabled={disabledUp || active}
-                    checked={disabledUp || active}
-                    onCheck={() => upVote(song, song._key || id)}/>
-                <Checkbox 
-                    style={{width: 50}}
-                    iconStyle={{width: 30, height: 30}}
-                    checkedIcon={<ThumbDown />}
-                    uncheckedIcon={<ThumbDown />}
-                    checked={disabledDown || active}
-                    disabled={disabledDown || active}
-                    onCheck={() => downVote(song, song._key || id)}/>
-                { visableDelete && 
-
-                <IconButton 
-                    style={{width: 0,height: 0,padding: 0}}
-                    onClick={() => onDeleteClick(song, song._key || id)}
-                    iconStyle={{width: 30, height: 30}}
-                >
-                    <DeleteIcon 
-                        style={{width: 0}}
-
-                    />
-                </IconButton>
-                }
-            </div>
-        </CardActions>
-    </Card>
-</div>
-);
+class SongItem extends Component { 
+	constructor (props){
+		super(props);
+		this.state = {
+			imgLoaded:false
+		}
+	}
+	handleImgLoaded = (event) =>{
+		this.setState({
+			imgLoaded:true
+		});
+	}
+	render() {
+		const { author, active, disabledUp, name, disabledDown, song,img, visableDelete, id, votes, downVote, upVote, onDeleteClick } = this.props;
+		const { imgLoaded } = this.state;
+		const style = imgLoaded ? {} : {visibility: 'hidden'}
+		return (
+			<div style={{ margin: '0 auto'}}>
+				<Card>
+					<CardMedia
+						style={{
+							maxWidth: '25em',
+							maxHeight: '25em',
+						}}
+						overlay={
+							<CardTitle title={
+								<Badge badgeContent={votes} primary={true}>
+									<span> {name} </span>
+								</Badge>
+							}
+							subtitle={"Submitted by "+author} 
+						/>}
+					>
+						<img src={img} style={style} onLoad={this.handleImgLoaded} alt="Artist Image" />
+					</CardMedia>
+					<CardActions>
+						<div style={{
+							display: 'flex',
+							flexDirection: 'row',
+						}}>
+							<Checkbox 
+								style={{width: 50}}
+								iconStyle={{width: 30, height: 30}}
+								checkedIcon={<ThumbUp />}
+								uncheckedIcon={<ThumbUp />}
+								disabled={disabledUp || active}
+								checked={disabledUp || active}
+								onCheck={() => upVote(song, song._key || id)}/>
+							<Checkbox 
+								style={{width: 50}}
+								iconStyle={{width: 30, height: 30}}
+								checkedIcon={<ThumbDown />}
+								uncheckedIcon={<ThumbDown />}
+								checked={disabledDown || active}
+								disabled={disabledDown || active}
+								onCheck={() => downVote(song, song._key || id)}/>
+							{ visableDelete && 
+							<IconButton 
+								style={{width: 0,height: 0,padding: 0}}
+								onClick={() => onDeleteClick(song, song._key || id)}
+								iconStyle={{width: 30, height: 30}}
+							>
+								<DeleteIcon 
+									style={{width: 0}}
+								/>
+							</IconButton>
+							}
+						</div>
+					</CardActions>
+				</Card>
+			</div>
+		);
+	}
+}
 export default SongItem; 
-/*
- *    <Card>
-     <CardHeader 
-        title={
-            <div className={classes.container}>
-                <Badge badgeContent={votes} primary={true}>
-                    <span className={classes.title}> {name} </span>
-                </Badge>
-            </div>
-        }
-        subtitle={"Song Submitted by " + author}
-        style={{
-            padding: '15%',
-            width: '100%',
-            height: '100%',
-        }}
-        />
-        <CardMedia
-      overlay={<CardTitle title="Overlay title" subtitle="Overlay subtitle" />}
-    >
-        <img src={img} alt="" />
-    </CardMedia>
-    <CardActions>
-        <div style={{display: "inline-block"}}> 
-        </CardActions>
-    </Card>
-
- * actionPosition="right"
-        titlePosition="top"
-        titleBackground={active ? "linear-gradient(to bottom,rgba(121,32,116,1) 0%, rgba(82,0,71,1) 0%, rgba(103,29,96,1) 100%": "linear-gradient(to bottom, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.3) 70%,rgba(0,0,0,0) 100%)"}
-    >
-    */

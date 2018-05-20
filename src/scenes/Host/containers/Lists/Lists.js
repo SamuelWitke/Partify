@@ -13,6 +13,7 @@ import Immutable from 'immutable';
 import Paper from 'material-ui/Paper';
 import SongsList from '../../componets/SongsList/'
 import ActiveSong from '../../componets/ActiveSong/'
+import Grid from '@material-ui/core/Grid';
 
 const fixedbutton = {
 	position: 'fixed',
@@ -20,6 +21,14 @@ const fixedbutton = {
 	right: '40px', 
 	size: '400px'
 }
+
+const styles = theme => ({
+	paper: {
+		padding: theme.spacing.unit * 2,
+		textAlign: 'center',
+		color: theme.palette.text.secondary,
+	},
+});
 
 const mapDispatchToProps = (dispatch)=> {
 	return({
@@ -57,16 +66,12 @@ export default class Lists extends Component {
 			activeSong: undefined, 
 		}
 	}
-
-
 	componentWillMount(){
 		let items = this.getItems(this.props);
 		const activeSong = items.find((obj) => {return obj.uri === this.props.active;});
 		items = items.filterNot( (obj) => {return obj.uri === this.props.active})
 		this.setState({activeSong: activeSong, items: items})
 	}
-
-
 	getItems = ({active,songs,params,uid,profile}) =>{
 		const items = Immutable.List(map( songs.toJS(), (song, id)  => {
 			const disabledUp = typeof song.song.project.votedUpBy == 'object' ? Object.keys(song.song.project.votedUpBy).map( key => key).includes(uid)  : false;
@@ -90,7 +95,6 @@ export default class Lists extends Component {
 		}))
 		return items.sort( (a,b) => a.votes - b.votes ).reverse();
 	}
-
 	componentWillReceiveProps(nextProps,){
 		if(!nextProps.songs.equals(this.props.songs)){
 			let items = this.getItems(nextProps);
@@ -99,11 +103,9 @@ export default class Lists extends Component {
 			this.setState({activeSong: activeSong, items: items})
 		}
 	}
-
 	shouldComponentUpdate(nextProps){
 		return !nextProps.songs.equals(this.props.songs) || this.props.active !== nextProps.active ? true : false;
 	}
-
 	componentWillUpdate(nextProps){
 		if(!nextProps.songs.equals(this.props.songs)){
 			let items = this.getItems(nextProps);
@@ -112,11 +114,9 @@ export default class Lists extends Component {
 			this.setState({activeSong: activeSong, items: items})
 		}
 	}
-
 	onClick = e => {
 		this.props.changeLocation(`Host/Songs/${this.props.params.name}`) 
 	}
-
 	upVote = async (songObj,id) => {
 		const {sendError, sendInfo, firebase, uid}= this.props;
 		const song = songObj;
@@ -138,7 +138,6 @@ export default class Lists extends Component {
 			})
 		}
 	}
-
 	downVote = (song,id) => {
 		const {sendError, sendInfo,name,firebase, uid}= this.props;
 		try{
@@ -170,7 +169,6 @@ export default class Lists extends Component {
 			console.error(e.message,e.stack)
 		}
 	}
-
 	onDelete = (song,id) => {
 		const { sendInfo, sendError, firebase, name} = this.props;
 		try{
@@ -190,45 +188,53 @@ export default class Lists extends Component {
 			console.error(e.message,e.stack)
 		}
 	}
-
-
 	render() {
 		const {active,songs,project,progress,firebase,params,uid,profile} = this.props;
 		const {items,activeSong} = this.state;
 		const admin = project.createdBy === profile.email;
 
 		return (
-			<div> 
-				{ activeSong && 
-				<ActiveSong 
-					progress = { progress }
-					name = { this.props.name }
-					firebase = { firebase }
-					activeSong={activeSong}
-					votes = { activeSong.votes }
-					onDelete={this.onDelete}
-					visableActive ={ admin || activeSong.visableDelete}
-				/>
-				}
-				{ items && items.size > 0 ? (
-					<SongsList 
-						admin={admin}
-						active = {active}
-						uid={uid}
-						onDelete={this.onDelete}
-						upVote={this.upVote}
-						downVote={this.downVote}
-						name={params.name} 
-						list={items} /> 
-				) : (
-					<div className={""}>Song Queue Empty</div>
-				)}
-				<FloatingActionButton 
-					style={fixedbutton}
-					secondary={true}
-					onClick={this.onClick}>
-					<ContentAdd />
-				</FloatingActionButton>
+			<div className={{flexGrow: 1}}>
+				<Grid container spacing={24}> 
+					{ activeSong && 
+					<Grid item xs={12}>
+						<Paper className={styles.paper}>
+							<ActiveSong 
+								progress = { progress }
+								name = { this.props.name }
+								firebase = { firebase }
+								activeSong={activeSong}
+								votes = { activeSong.votes }
+								onDelete={this.onDelete}
+								visableActive ={ admin || activeSong.visableDelete}
+							/>
+						</Paper>
+					</Grid>
+					}
+					{ items.size > 0 ? (
+						<Grid item xs={12}>
+							<SongsList 
+								admin={admin}
+								active = {active}
+								uid={uid}
+								onDelete={this.onDelete}
+								upVote={this.upVote}
+								downVote={this.downVote}
+								name={params.name} 
+								list={items} /> 
+						</Grid>
+					) : (
+					<Grid item xs={12}>
+						Song Queue Empty
+						</Grid>
+					)}
+					<FloatingActionButton 
+						style={fixedbutton}
+						secondary={true}
+						onClick={this.onClick}>
+						<ContentAdd />
+					</FloatingActionButton>
+				</Grid>
 			</div>
 		);
 	}

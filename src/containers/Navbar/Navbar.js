@@ -40,7 +40,7 @@ const avatarStyles = {
 		width: '30px',
 		height: '64px',
 		padding: '0'
-		}
+	}
 }
 
 @firebaseConnect()
@@ -51,18 +51,18 @@ const avatarStyles = {
 export default class Navbar extends Component {
 	static contextTypes = {
 		router: PropTypes.object.isRequired
-		}
+	}
 
 	static propTypes = {
 		profile: PropTypes.object,
 		auth: PropTypes.object,
 		firebase: PropTypes.object.isRequired
-		}
+	}
 
 	handleLogout = () => {
 		this.props.firebase.logout()
 		this.context.router.push('/')
-		}
+	}
 
 	render() {
 		const { profile, auth } = this.props
@@ -76,22 +76,22 @@ export default class Navbar extends Component {
 						<Avatar
 							src={
 								profile && profile.avatarUrl
-								? profile.avatarUrl
-								:  Math.random() >= 0.5 ? 
-								defaultUserImage1
-								: defaultUserImage2
-							}
-						/>
+									? profile.avatarUrl
+									:  Math.random() >= 0.5 ? 
+									defaultUserImage1
+									: defaultUserImage2
+								}
+							/>
+						</div>
+						<div className={classes['avatar-text']}>
+							<span className={`${classes['avatar-text-name']} hidden-mobile`}>
+								{profile && profile.displayName ? profile.displayName : 'User'}
+							</span>
+							<DownArrow color="white" />
+						</div>
 					</div>
-					<div className={classes['avatar-text']}>
-						<span className={`${classes['avatar-text-name']} hidden-mobile`}>
-							{profile && profile.displayName ? profile.displayName : 'User'}
-						</span>
-						<DownArrow color="white" />
-					</div>
-				</div>
-			</IconButton>
-			)
+				</IconButton>
+		)
 
 		const rightMenu =
 			dataLoaded && authExists ? (
@@ -106,16 +106,16 @@ export default class Navbar extends Component {
 					/>
 					<MenuItem primaryText="Sign out" onTouchTap={this.handleLogout} />
 				</IconMenu>
-				) : (
-					<div className={classes.menu}>
-						<Link to={SIGNUP_PATH}>
-							<FlatButton label="Sign Up" style={buttonStyle} />
-						</Link>
-						<Link to={LOGIN_PATH}>
-							<FlatButton label="Login" style={buttonStyle} />
-						</Link>
-					</div>
-					)
+			) : (
+				<div className={classes.menu}>
+					<Link to={SIGNUP_PATH}>
+						<FlatButton label="Sign Up" style={buttonStyle} />
+					</Link>
+					<Link to={LOGIN_PATH}>
+						<FlatButton label="Login" style={buttonStyle} />
+					</Link>
+				</div>
+			)
 
 		return (
 			<AppBar
@@ -125,17 +125,17 @@ export default class Navbar extends Component {
 							<img src={Logo} style={{paddingTop: 15, hight: 80, width: 80}}/>
 						</Link>
 						{ auth.email &&
-						<Link to={ LIST_PATH } style={{paddingTop: 20, paddingLeft: 20}}>
+						<Link to={ LIST_PATH } style={{ paddingLeft: 20}}>
 							<HomeIcon />
 						</Link>
 						}
 					</div>
-					}
-					showMenuIconButton={false}
-					iconElementRight={rightMenu}
-					iconStyleRight={authExists ? avatarStyles.wrapper : {}}
-					className={classes.appBar}
-				/>
-			)
-		}
+				}
+				showMenuIconButton={false}
+				iconElementRight={rightMenu}
+				iconStyleRight={authExists ? avatarStyles.wrapper : {}}
+				className={classes.appBar}
+			/>
+		)
+	}
 }

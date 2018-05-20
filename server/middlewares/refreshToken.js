@@ -1,4 +1,4 @@
-const logger = require('../build/lib/logger')
+const logger = require('../../build/lib/logger')
 const request = require('request');
 const admin = require('firebase-admin');
 

@@ -58,7 +58,7 @@ export default class ProjectContainer extends Component {
 			access_token: project.access_token,
 			refresh_token: project.refresh_token,
 		}
-		const res = await(fetch("/user-playlist",{
+		const res = await(fetch("playlist/user-playlist",{
 			headers: {
 				'Accept': 'application/json, text/plain, */*',
 				'Content-Type': 'application/json'
@@ -109,7 +109,7 @@ export default class ProjectContainer extends Component {
 			refresh_token: project.refresh_token,
 		}
 		this.setState({loading: true})
-		fetch("/submit-playlist",{
+		fetch("playlist/submit-playlist",{
 			headers: {
 				'Accept': 'application/json, text/plain, */*',
 				'Content-Type': 'application/json'

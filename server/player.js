@@ -4,7 +4,7 @@ const url = require('url')
 const  kue = require('./kue.js');
 const logger = require('../build/lib/logger')
 const request = require('request-promise');
-const refreshToken = require('./refreshToken.js')
+const refreshToken = require('./middlewares/refreshToken.js')
 
 admin.initializeApp({
     credential: admin.credential.cert(info.firebase),

@@ -75,7 +75,6 @@ if( process.env.NODE_ENV === 'production' ){
     }, 300000); // every 5 minutes (300000) 
 }
 
-const routes = require('./routes');
 const admin = require('./player.js');
 
 app.use(compress())
@@ -85,7 +84,7 @@ app.use(cookieParser())
         extended: false
     }))
     .use(express.static(path.resolve(project.basePath, project.outDir)))
-    .use('/', routes);
+    .use('/', require('./controllers/'));
 
 app.use('*', function(req, res, next) {
     const filename = path.join(compiler.outputPath, 'index.html')
