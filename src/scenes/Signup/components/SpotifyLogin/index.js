@@ -1,3 +1,3 @@
-import {SpotifyLogin} from './SpotifyLogin'
+import SpotifyLogin from './SpotifyLogin'
 
 export default SpotifyLogin; 

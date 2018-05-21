@@ -10,13 +10,20 @@ import {
   compose,
   lifecycle
 } from 'recompose'
-import { withNotifications } from 'modules/notification'
 import { UserIsNotAuthenticated } from 'utils/router'
 import { SIGNUP_PATH } from 'constants'
 import LoginForm from '../LoginForm'
 import Card from 'material-ui/Card';
-
 import classes from './LoginPage.scss'
+import { connect } from 'react-redux'
+import { error } from 'react-notification-system-redux';
+
+const mapDispatchToProps = (dispatch)=> {
+  return({
+    sendError: (errorObj) => dispatch(error(errorObj))
+  })
+}
+
 
 let applicationVerifier
 
@@ -56,8 +63,8 @@ LoginPage.propTypes = {
 
 export default compose(
   UserIsNotAuthenticated, // redirect to projects page if already authenticated
-  withNotifications, // add props.showError
   withFirebase, // add props.firebase
+	connect(null,mapDispatchToProps),
   lifecycle({
     componentDidMount() {
       applicationVerifier = new this.props.firebase.auth

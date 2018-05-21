@@ -19,15 +19,16 @@ export const withAuth = (WrappedComponent) => {
 			}
 		}
 		componentDidMount() {
-		const {dispatch} = this.props;
+			const {dispatch} = this.props;
+			/* Due to redux cookies being stupid this hack exists */
 			const data = dispatch(cookiesGet('spotify')) || "11{}";
 			const str = data.substring(2)
-			const x =JSON.parse(str); 
+			const x = JSON.parse(str); 
+
 			const accessToken = x.accessToken;
 			this.setState({accessToken: accessToken});
 			const refreshToken = x.refreshToken;
 
-            //dispatch(getMyDevices(x.devices.devices));
 			dispatch(setTokens({accessToken, refreshToken}));
 			dispatch(getMyInfo(x.me));
 		}
@@ -37,16 +38,16 @@ export const withAuth = (WrappedComponent) => {
 				{ this.state.accessToken ? (
 					<WrappedComponent {...this.props} 
 					/>
-      		) : (
-						<SpotifyLogin />
-      		)}
-				</div>
-				);
-			}
+				) : (
+					<SpotifyLogin />
+				)}
+			</div>
+			);
 		}
+	}
 
 	WithAuthComponent.propTypes = {
 		token: PropTypes.string,
-		}
+	}
 	return connect(state => state)(WithAuthComponent)
 }

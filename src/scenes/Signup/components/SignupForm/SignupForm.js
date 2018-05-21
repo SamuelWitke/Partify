@@ -15,18 +15,18 @@ const renderRadioGroup = ({input, ...rest}) => (
 		valueSelected={input.value}
 		onChange={(event, value) => input.onChange(value)}
 	/>
-	)
+)
 
 const SignupForm = ({ user, pristine, submitting, handleSubmit, devices }) => (
 	<form className={classes.container} onSubmit={handleSubmit}>
 		<Field
+			disabled={user ? true : false}
 			name="displayName"
 			component={TextField}
 			floatingLabelText="Username"
 			validate={required}
 		/>
 		<Field
-			disabled={user ? true : false}
 			name="email"
 			component={TextField}
 			floatingLabelText="Email"
@@ -40,31 +40,15 @@ const SignupForm = ({ user, pristine, submitting, handleSubmit, devices }) => (
 			validate={required}
 		/>
 		<br/>
-            {/*
-		<div>
-			<Field name="device" component={renderRadioGroup}>
-				{devices && 
-					devices.map( elm =>	 {
-					return (
-						<RadioButton 
-							label={elm.name} 
-							value={elm.id} 
-							name='device' />
-						);
-					})}			
-				</Field>
-			</div>
-		   */}
-	<div className={classes.submit}>
-				<RaisedButton
-					label="Signup"
-					primary
-					type="submit"
-					disabled={pristine || submitting}
-				/>
-			</div>
-         
-		</form>
+		<div className={classes.submit}>
+			<RaisedButton
+				label="Signup"
+				primary
+				type="submit"
+				disabled={pristine || submitting}
+			/>
+		</div>
+	</form>
 )
 
 SignupForm.propTypes = {
