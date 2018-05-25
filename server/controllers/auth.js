@@ -85,6 +85,48 @@ module.exports = {
 			};
 			res.clearCookie(stateKey);
 		})
+		router.post('/refresh_token', (req, res, next) => {
+			const  refresh_token  = req.cookies ? req.cookies['spotify'] : null;
+      const request = (refresh_token) => {
+			return new Promise((resolve, reject) =>  {
+        logger.info("Requesting refresh_token")
+        const authOptions = {
+            url: 'https://accounts.spotify.com/api/token',
+            headers: { 'Authorization': 'Basic ' + (new Buffer(process.env.SPOTIFYCLIENT+ ':' + process.env.SPOTIFYSECRET).toString('base64')) },
+            form: {
+                grant_type: 'refresh_token',
+                refresh_token: refresh_token
+            },
+            json: true
+        };
+        request.post(authOptions, async (error, response, body) => {
+            if (!error && response.statusCode === 200) {
+                const access_token = body.access_token;
+								/*
+                if( device )
+                    await admin.database().ref(`/users/${name}/accessToken`).set(access_token);
+                else 
+                    await admin.database().ref(`/projects/${name}/access_token`).set(access_token)
+										*/
+                resolve(accessToken);
+            }else{
+                reject()
+            }
+        });
+			})
+    }
+		request( refresh_token )
+			.then( access_token => {
+					const data = { 
+								'accessToken' : access_token, 
+								'refreshToken' : refresh_token,
+						}
+				res.cookie('spotify',data);
+				})
+			.catch( err => {
+				res.sendStatus(400);
+			});
+		})
 		return router;
 	}
 }

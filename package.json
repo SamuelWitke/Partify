@@ -72,6 +72,7 @@
     "gulp-sass": "^4.0.1",
     "history": "^4.7.2",
     "html-webpack-plugin": "^2.29.0",
+    "https": "^1.0.0",
     "husky": "^0.14.3",
     "immutable": "^3.8.2",
     "ip": "^1.1.5",

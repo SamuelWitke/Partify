@@ -17,11 +17,13 @@ import NewProjectDialog from '../components/NewProjectDialog'
 import classes from './ProjectsContainer.scss'
 import { push } from 'react-router-redux'
 import { error } from 'react-notification-system-redux';
+import { cookiesGet } from 'redux-cookies';
 
 const mapDispatchToProps = (dispatch)=> {
 	return({
 		changeLocation: (loc) => dispatch(push(loc)),
-		sendError: (errorObj) => dispatch(error(errorObj))
+		sendError: (errorObj) => dispatch(error(errorObj)),
+		getSpotifyCookie: ()  => dispatch(cookiesGet('spotify'))
 	})
 }
 
@@ -64,17 +66,15 @@ export default class Projects extends Component {
 
 
 	fetchDevices = async ()=>{
-		const { sendError, firebase, auth, projects, dispatch, spotifyReducer} = this.props
-		let user = await this.fetchUser()
-		const accessRef = this.props.firebase.database().ref(`users/${user.uid}/accessToken`);
-		const refreshToken = this.props.firebase.database().ref(`users/${user.uid}/refreshToken`);
-
-		const snapshotAccess = await accessRef.once('value');
-		const snapshotRefresh = await refreshToken.once('value');
+		const { getSpotifyCookie, sendError, firebase, auth, projects, dispatch, spotifyReducer} = this.props
+		const json = getSpotifyCookie();		
+		const str  = json.substring(2);
+    const jsonData   = JSON.parse(str);
+		console.log(jsonData);
 		const body = {
-			name: user.uid,
-			access_token: snapshotAccess.val(), 
-			refresh_token: snapshotRefresh.val(), 
+			name: jsonData.me.uid,
+			access_token: jsonData.accessToken, 
+			refresh_token: jsonData.refreshToken, 
 		}
 		const response = await fetch('/devices',{
 			headers: {
@@ -126,7 +126,7 @@ export default class Projects extends Component {
 	}
 
 	newSubmit = async newProject => {
-		const {firebase,auth,spotifyReducer,sendError} = this.props;
+		const {firebase,auth,sendError} = this.props;
 
 		if(newProject.device == undefined){
 			sendError({
@@ -138,6 +138,7 @@ export default class Projects extends Component {
 		}
 
 		newProject['createdBy'] = auth.email;
+		/*
 		const accessRef = firebase.database().ref(`users/${auth.uid}/accessToken`);
 		const refreshToken = firebase.database().ref(`users/${auth.uid}/refreshToken`);
 		const snapshotAccess = await accessRef.once('value');
@@ -145,6 +146,7 @@ export default class Projects extends Component {
 
 		newProject['access_token'] = snapshotAccess.val();
 		newProject['refresh_token'] = snapshotRefresh.val();
+		*/
 
 		firebase
 			.set(`projects/${newProject.name}`,newProject)

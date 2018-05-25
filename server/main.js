@@ -17,8 +17,6 @@ const compiler = webpack(webpackConfig)
 const url = require('url')
 const  kue = require('./kue.js');
 
-//const player = require('./player.js')
-
 if (project.env === 'development') {
 
     const kueUiExpress = require('kue-ui-express');
