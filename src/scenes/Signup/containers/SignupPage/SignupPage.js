@@ -51,6 +51,7 @@ class SignupPage extends React.PureComponent {
 
 	render(){
 		const { Spotify } = this.props;
+		console.log('here');
 		return (
 			<div className={classes.container}>
 				<Card className={classes.panel}>

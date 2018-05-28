@@ -75,7 +75,10 @@ module.exports = {
 								'refreshToken' : refresh_token,
 								'me' : body
 							}
-							res.cookie('spotify',data);
+							res.cookie('spotify-access', access_token);
+							res.cookie('spotify-refresh', access_token);
+							res.cookie('spotify-me', body);
+
 							res.redirect('/#/signup');
 						});
 						}else{
