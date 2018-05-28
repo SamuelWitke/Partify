@@ -6,11 +6,8 @@ import {
 } from 'react-redux-firebase'
 import locationReducer from './location'
 import hashHistory  from '../history';
-import spotifyReducer from './spotify.js';
-import hostReducer from './host.js';
 import {reducer as notifications} from 'react-notification-system-redux';
-
-
+import {reducer as Spotify} from './spotify';
 
 export const makeRootReducer = asyncReducers => {
   return combineReducers({
@@ -20,8 +17,7 @@ export const makeRootReducer = asyncReducers => {
     form,
     location: locationReducer,
     notifications,
-    hostReducer,
-    spotifyReducer,
+    Spotify,
     ...asyncReducers
   })
 }

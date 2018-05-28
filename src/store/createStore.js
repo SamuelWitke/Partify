@@ -10,9 +10,7 @@ import { version } from '../../package.json'
 import { updateLocation } from './location'
 import { routerMiddleware} from 'react-router-redux'
 import hashHistory from '../history';
-import {getCookiesMiddleware} from 'redux-cookies';
 import logger from 'redux-logger'
-import Cookies from 'js-cookie';
 
 
 const reactRouterMiddleware = routerMiddleware(hashHistory);
@@ -30,7 +28,6 @@ export default (initialState = {}) => {
     thunk.withExtraArgument(getFirebase),
     logger,
 		reactRouterMiddleware,
-		getCookiesMiddleware(Cookies),
     // This is where you add other middleware like redux-observable
   ]
 
@@ -47,7 +44,6 @@ export default (initialState = {}) => {
 
   // Initialize Firebase instance and Firestore (optional)
   firebase.initializeApp(fbConfig)
-  // firebase.firestore()
 
   // ======================================================
   // Store Instantiation and HMR Setup

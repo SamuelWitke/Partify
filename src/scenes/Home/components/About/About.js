@@ -15,7 +15,7 @@ const styles = theme => ({
 const About = () => (
 	<div style={{ backgroundColor: '#151516', flexGrow: 1}}>
 		<Paper className={styles.paper}>                
-			<Card body style={{backgroundColor: '#151516' }}>
+			<Card style={{backgroundColor: '#151516' }}>
 				<CardTitle style={{color: 'white'}}> 
 					Partify                     </CardTitle>
 				<CardText style={{color: 'white'}}>

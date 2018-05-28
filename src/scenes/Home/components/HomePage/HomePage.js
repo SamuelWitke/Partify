@@ -8,7 +8,6 @@ import {push} from 'react-router-redux'
 import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card';
 import { firebaseConnect, populate } from 'react-redux-firebase'
 import { success, error, warning, info, removeAll } from 'react-notification-system-redux';
-import { setHost } from 'store/host.js';
 import Paper from 'material-ui/Paper';
 import Logo from 'static/LOGO PARTIFY 1.png'
 
@@ -60,7 +59,7 @@ const HomePage = ({ addNew, onSubmitFail }) => (
 				className={"img-fluid"} 
 				overlay={
 					<CardTitle title={
-						<img top height="55%" width="55%" src={Logo} alt="Card image cap" />
+						<img height="55%" width="55%" src={Logo} alt="Card image cap" />
 						}
 					/>} />
 			<CardText className={classes.info}>
