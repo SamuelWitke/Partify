@@ -1,9 +1,20 @@
 const logger = require('../lib/logger')
-//const ip = require('ip');
+const path = require('path');
+const fs = require('fs'),
+ 			https = require('https'),
+  		express = require('express');
 
 logger.info('Starting server...')
 
+var sslOptions = {
+  key: fs.readFileSync(path.resolve(__dirname,'sslcert','localhost.key')),
+  cert: fs.readFileSync(path.resolve(__dirname,'sslcert','localhost.crt')),
+  ca: fs.readFileSync(path.resolve(__dirname,'sslcert','localhost_CA.pem'))
+};
+
 const PORT = process.env.PORT || 3000; 
-require('../../server/main').listen(PORT, () => {
-  logger.success('Server is running at ',PORT)
-})
+const app =require('../../server/main');
+
+https.createServer(sslOptions, app).listen(PORT, function(){
+  console.log("HTTPS Express server listening localhost on port "+PORT);
+});

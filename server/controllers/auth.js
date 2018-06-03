@@ -3,7 +3,8 @@ const stateKey = 'spotify_auth_state';
 const request = require('request');
 const client_id = process.env.SPOTIFYCLIENT;
 const client_secret = process.env.SPOTIFYSECRET;
-const redirect_uri = process.env.redirect_uri || 'http://localhost:3000/auth/callback';
+const PORT = process.env.PORT || 3000;
+const redirect_uri = process.env.redirect_uri || 'https://localhost:3000/auth/callback';
 const querystring = require('querystring');
 const scopes = ['user-read-private', 'user-read-email', 'user-read-playback-state' ,'user-read-currently-playing','user-modify-playback-state', 'streaming'];
 /** Generates a random string containing numbers and letters of N characters */
