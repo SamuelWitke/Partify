@@ -26,7 +26,7 @@ var sslOptions = {
 const app =require('../../server/main');
 
 http.createServer(httpApp).listen(3080, function(){
-  console.log("HTTPS Express server listening localhost on port "+3080);
+  console.log("HTTP Express server listening localhost on port "+3080);
 });
 
 https.createServer(sslOptions, app).listen(PORT, function(){
