@@ -22,7 +22,7 @@ const SpotifyLogin= ({classes}) => (
 <div className={classes.root}>
 	<Grid container spacing={24}>
 		<Grid item xs={12}>
-		 <Paper className={classes.paper} zDepth={5}>
+		 <Paper className={classes.paper}>
 			<a href="/auth/oauth" >
 				<img src={loginSVG} />
 			</a>                              

@@ -1,0 +1,19 @@
+{
+    "manifest_version": 2,
+    "name": "webextension-example",
+    "version": "0.1",
+    "description": "An example.",
+    "background": {
+        "scripts": ["background.js"]
+    },
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "js": ["script.js"]
+        }
+    ],
+    "permissions": [
+        "notifications",
+        "activeTab"
+    ]
+}

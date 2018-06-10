@@ -20,7 +20,6 @@
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },
-  "author": "testuser (https://github.com/testuser)",
   "license": "MIT",
   "dependencies": {
     "@material-ui/core": "^1.0.0",
@@ -72,6 +71,8 @@
     "gulp-sass": "^4.0.1",
     "history": "^4.7.2",
     "html-webpack-plugin": "^2.29.0",
+    "http": "^0.0.0",
+    "https": "^1.0.0",
     "husky": "^0.14.3",
     "immutable": "^3.8.2",
     "ip": "^1.1.5",

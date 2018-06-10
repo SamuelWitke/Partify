@@ -17,8 +17,6 @@ const compiler = webpack(webpackConfig)
 const url = require('url')
 const  kue = require('./kue.js');
 
-//const player = require('./player.js')
-
 if (project.env === 'development') {
 
     const kueUiExpress = require('kue-ui-express');
@@ -78,16 +76,16 @@ if( process.env.NODE_ENV === 'production' ){
 const admin = require('./player.js');
 
 app.use(compress())
-app.use(cookieParser())
-    .use(bodyParser.json())
-    .use(bodyParser.urlencoded({
-        extended: false
-    }))
-    .use(express.static(path.resolve(project.basePath, project.outDir)))
-    .use('/', require('./controllers/'));
+	 .use(cookieParser())
+   .use(bodyParser.json())
+   .use(bodyParser.urlencoded({extended: false}))
+   .use(express.static(path.resolve(project.basePath, project.outDir)))
+   .use('/', require('./controllers/'));
 
+/*
 app.use('*', function(req, res, next) {
     const filename = path.join(compiler.outputPath, 'index.html')
 })
+*/
 
 module.exports = app

@@ -40,7 +40,7 @@ class CunyTech extends Component {
 				<div style={{ backgroundColor: '#151516',  flexGrow: 1}}>
 					<Grid item xs={12}>
 						<Paper className={styles.paper}>
-							<Card body style={{backgroundColor: '#151516' }}>
+							<Card style={{backgroundColor: '#151516' }}>
 								<CardTitle style={{color: 'white'}}> 
 									Application Created In  <a href="https://cunytechprep.nyc/"> CUNY Tech Prep </a>
 								</CardTitle>

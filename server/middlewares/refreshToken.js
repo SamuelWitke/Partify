@@ -14,7 +14,6 @@ const refreshToken = (refresh_token,name,device) => {
             },
             json: true
         };
-
         request.post(authOptions, async (error, response, body) => {
             if (!error && response.statusCode === 200) {
                 var access_token = body.access_token;
