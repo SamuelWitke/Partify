@@ -32,3 +32,14 @@ http.createServer(httpApp).listen(3080, function(){
 https.createServer(sslOptions, app).listen(PORT, function(){
   console.log("HTTPS Express server listening localhost on port "+PORT);
 });
+/*
+const logger = require('../lib/logger')
+//const ip = require('ip');
+
+logger.info('Starting server...')
+
+const PORT = process.env.PORT || 3000; 
+require('../../server/main').listen(PORT, () => {
+  logger.success('Server is running at ',PORT)
+	})
+	*/
