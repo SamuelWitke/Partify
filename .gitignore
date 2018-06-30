@@ -8,3 +8,4 @@ coverage
 .env
 ./src/.config.js
 .redis-labs.js
+/build/scripts/sslcert/
