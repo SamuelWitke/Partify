@@ -27,6 +27,8 @@ Get Api keys for Spotify and firebase
 5. Vote on songs to play next
 6. Repeat steps 4&5
 ```
+![Demo Gif](./src/static/demo.gif?raw=true "Demo")
+
 
 ## Accepting Pull Requests 
 * Add an issue and fork the repo [Here For More Info On Contributing](https://gist.github.com/MarcDiethelm/7303312)

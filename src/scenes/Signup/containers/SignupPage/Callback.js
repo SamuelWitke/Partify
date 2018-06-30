@@ -16,7 +16,6 @@ export const withAuth = (WrappedComponent) => {
 			const refreshToken = document.cookie.replace(/(?:(?:^|.*;\s*)spotify-refresh\s*\=\s*([^;]*).*$)|^.*$/, "$1") || undefined
 			/* Due to cookies being stored in a URI format this hack exists */
 			const cookieUser = decodeURIComponent(document.cookie.replace(/(?:(?:^|.*;\s*)spotify-me\s*\=\s*([^;]*).*$)|^.*$/, "$1"))|| undefined;
-			console.log("herere",cookieUser);
 			const user = cookieUser !== undefined ? JSON.parse(cookieUser.substring(2)) : undefined;
 			if(accessToken != undefined && refreshToken != undefined && user != undefined)	{
 				setSpotifyData({accessToken,refreshToken,user})

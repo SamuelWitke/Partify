@@ -15,9 +15,8 @@ import classes from './SignupPage.scss'
 @withFirebase // add props.firebase (firebaseConnect() can also be used)
 @connect(
 		({Spotify}) => ({ Spotify }),
-		(dispatch) => ({ sendError: err => dispatch(error(err)) })
+		(dispatch) => ({ sendError: err => dispatch(error(err)),})
 )
-@UserIsNotAuthenticated
 class SignupPage extends React.PureComponent {
 	onSubmitFail = (error) => {
 		const { sendError } = this.props;
@@ -51,7 +50,6 @@ class SignupPage extends React.PureComponent {
 
 	render(){
 		const { Spotify } = this.props;
-		console.log('here');
 		return (
 			<div className={classes.container}>
 				<Card className={classes.panel}>
