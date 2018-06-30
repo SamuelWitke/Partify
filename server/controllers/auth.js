@@ -1,4 +1,3 @@
-const Spotify = require('spotify-web-api-node');
 const stateKey = 'spotify_auth_state';
 const request = require('request');
 const client_id = process.env.SPOTIFYCLIENT;
