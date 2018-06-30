@@ -21,7 +21,7 @@ const mapDispatchToProps = (dispatch)=> {
 }
 @connect(
 	( {}, { params: { projectname } }) => ({
-		projectname: projectname,
+		projectname: projectname.trim(),
 	})
 )
 @firebaseConnect(({projectname}) => [
