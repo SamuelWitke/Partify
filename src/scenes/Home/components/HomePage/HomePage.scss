@@ -1,19 +1,18 @@
 @import 'base';
 .container {
-   // @extend .flex-column-center;
+    // @extend .flex-column-center;
     //padding-top: 10em;
 }
+
 .info {
     filter: alpha(opacity=60);
     color: #ecb985 !important;
-
 }
 
 .card {
     background: rgba(0, 0, 0, 0.54) !important;
     top: 10px;
 }
-
 
 .img {
     width: 100%;
@@ -27,9 +26,8 @@
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-		height: 850px;
-    background-size: cover;
-    //background-image: url('../../../../static/20151017_000009.jpg');
+    height: 850px;
+    background-size: cover; //background-image: url('../../../../static/20151017_000009.jpg');
     // Free image available 
-    background-image: url('https://visualhunt.com/photos/7/sparklers-manly-personable.jpg?s=l');
+    background-image: url('http://static.tumblr.com/54cac0794a6cb43fd4cd1fe946142290/odmttxx/ilmn1r5kd/tumblr_static_party-music-hd-wallpaper-1920x1200-3850.jpg')
 }
