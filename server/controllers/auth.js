@@ -2,12 +2,21 @@ const stateKey = 'spotify_auth_state';
 const request = require('request');
 const client_id = process.env.SPOTIFYCLIENT;
 const client_secret = process.env.SPOTIFYSECRET;
+if(client_id === undefined)
+	throw Error(
+		"Spotify Client ID undefined"
+	)
+if(client_secret === undefined ){
+	throw Error(
+		"Spotify Secrect undefined"
+	)
+}
 const PORT = process.env.PORT || 3000;
 const redirect_uri = process.env.redirect_uri || 'https://localhost:3000/auth/callback';
 const querystring = require('querystring');
-const scopes = ['user-read-private', 'user-read-email', 'user-read-playback-state' ,'user-read-currently-playing','user-modify-playback-state', 'streaming'];
+const scopes = ['user-read-private', 'user-read-email', 'user-read-playback-state', 'user-read-currently-playing', 'user-modify-playback-state', 'streaming'];
 /** Generates a random string containing numbers and letters of N characters */
-const generateRandomString = N => (Math.random().toString(36)+Array(N).join('0')).slice(2, N+2);
+const generateRandomString = N => (Math.random().toString(36) + Array(N).join('0')).slice(2, N + 2);
 const express = require('express');
 
 module.exports = {
@@ -28,7 +37,7 @@ module.exports = {
 					client_id,
 					scope: scopes.toString(),
 					redirect_uri,
-					state 
+					state
 				}));
 		});
 
@@ -59,7 +68,7 @@ module.exports = {
 					},
 					json: true
 				};
-				request.post(authOptions, function(error, response, body) {
+				request.post(authOptions, function (error, response, body) {
 					if (!error && response.statusCode === 200) {
 						const access_token = body.access_token,
 							refresh_token = body.refresh_token;
@@ -69,11 +78,11 @@ module.exports = {
 							json: true
 						};
 						// use the access token to access the Spotify Web API
-						request.get(options, function(error, response, body) {
-							const data = { 
-								'accessToken' : access_token, 
-								'refreshToken' : refresh_token,
-								'me' : body
+						request.get(options, function (error, response, body) {
+							const data = {
+								'accessToken': access_token,
+								'refreshToken': refresh_token,
+								'me': body
 							}
 							res.cookie('spotify-access', access_token);
 							res.cookie('spotify-refresh', access_token);
@@ -81,54 +90,54 @@ module.exports = {
 
 							res.redirect('/#/signup');
 						});
-						}else{
-							res.redirect('/#/error/statemismatch');
-						}
-					});
+					} else {
+						res.redirect('/#/error/statemismatch');
+					}
+				});
 			};
 			res.clearCookie(stateKey);
 		})
 		router.post('/refresh_token', (req, res, next) => {
-			const  refresh_token  = req.cookies ? req.cookies['spotify'] : null;
-      const request = (refresh_token) => {
-			return new Promise((resolve, reject) =>  {
-        logger.info("Requesting refresh_token")
-        const authOptions = {
-            url: 'https://accounts.spotify.com/api/token',
-            headers: { 'Authorization': 'Basic ' + (new Buffer(process.env.SPOTIFYCLIENT+ ':' + process.env.SPOTIFYSECRET).toString('base64')) },
-            form: {
-                grant_type: 'refresh_token',
-                refresh_token: refresh_token
-            },
-            json: true
-        };
-        request.post(authOptions, async (error, response, body) => {
-            if (!error && response.statusCode === 200) {
-                const access_token = body.access_token;
-								/*
-                if( device )
-                    await admin.database().ref(`/users/${name}/accessToken`).set(access_token);
-                else 
-                    await admin.database().ref(`/projects/${name}/access_token`).set(access_token)
-										*/
-                resolve(accessToken);
-            }else{
-                reject()
-            }
-        });
-			})
-    }
-		request( refresh_token )
-			.then( access_token => {
-					const data = { 
-								'accessToken' : access_token, 
-								'refreshToken' : refresh_token,
+			const refresh_token = req.cookies ? req.cookies['spotify'] : null;
+			const request = (refresh_token) => {
+				return new Promise((resolve, reject) => {
+					logger.info("Requesting refresh_token")
+					const authOptions = {
+						url: 'https://accounts.spotify.com/api/token',
+						headers: { 'Authorization': 'Basic ' + (new Buffer(process.env.SPOTIFYCLIENT + ':' + process.env.SPOTIFYSECRET).toString('base64')) },
+						form: {
+							grant_type: 'refresh_token',
+							refresh_token: refresh_token
+						},
+						json: true
+					};
+					request.post(authOptions, async (error, response, body) => {
+						if (!error && response.statusCode === 200) {
+							const access_token = body.access_token;
+							/*
+			if( device )
+				await admin.database().ref(`/users/${name}/accessToken`).set(access_token);
+			else 
+				await admin.database().ref(`/projects/${name}/access_token`).set(access_token)
+									*/
+							resolve(accessToken);
+						} else {
+							reject()
 						}
-				res.cookie('spotify',data);
+					});
 				})
-			.catch( err => {
-				res.sendStatus(400);
-			});
+			}
+			request(refresh_token)
+				.then(access_token => {
+					const data = {
+						'accessToken': access_token,
+						'refreshToken': refresh_token,
+					}
+					res.cookie('spotify', data);
+				})
+				.catch(err => {
+					res.sendStatus(400);
+				});
 		})
 		return router;
 	}

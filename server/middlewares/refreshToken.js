@@ -16,13 +16,15 @@ const refreshToken = (refresh_token,name,device) => {
         };
         request.post(authOptions, async (error, response, body) => {
             if (!error && response.statusCode === 200) {
-                var access_token = body.access_token;
+                const access_token = body.access_token;
+                logger.info("New token for user",name)
                 if( device )
                     await admin.database().ref(`/users/${name}/accessToken`).set(access_token);
                 else 
                     await admin.database().ref(`/projects/${name}/access_token`).set(access_token)
                 resolve("Request Completed!");
             }else{
+                logger.error("Error in request post",error,JSON.stringify(response), JSON.stringify(body))
                 reject()
             }
         });

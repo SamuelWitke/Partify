@@ -74,9 +74,11 @@ export default class Lists extends Component {
 	}
 	getItems = ({active,songs,params,uid,profile}) =>{
 		const items = Immutable.List(map( songs.toJS(), (song, id)  => {
-			const disabledUp = typeof song.song.project.votedUpBy == 'object' ? Object.keys(song.song.project.votedUpBy).map( key => key).includes(uid)  : false;
-			const disabledDown = typeof song.song.project.votedDownBy == 'object' ? Object.keys(song.song.project.votedDownBy).map( key => key).includes(uid)  : false;
+
+			const disabledUp = typeof song.song.project.votedUpBy === 'object' ? Object.keys(song.song.project.votedUpBy).map( key => key).includes(uid)  : false;
+			const disabledDown = typeof song.song.project.votedDownBy === 'object' ? Object.keys(song.song.project.votedDownBy).map( key => key).includes(uid)  : false;
 			const visableDelete = song.song.project.submitedBy === uid  
+
 			const author = song.song.project.author;
 			const img = song.song.album.images[0].url;
 			const votes = song.song.project.votes;

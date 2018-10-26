@@ -96,7 +96,7 @@ router.post('/devices', (req,res) => {
             headers: { 'Authorization': 'Bearer ' + access_token },
             json: true
         };
-        request.get(options, function(error, response, body) {
+        request.get(options, (error, response, body) => {
             if(body.error == null && body.devices.length > 0){
                 body.devices.forEach( (device) => {
                     devices.push({
@@ -106,7 +106,7 @@ router.post('/devices', (req,res) => {
                     });
                 });
                 res.json({devices});
-            }else if(body.error != undefined  && body.error.message == 'The access token expired'){
+            }else if(body.error != undefined  && body.error.message === 'The access token expired'){
                 authOptions = {
                     url: 'https://accounts.spotify.com/api/token',
                     headers: { 'Authorization': 'Basic ' + (new Buffer(process.env.SPOTIFYCLIENT+ ':' + process.env.SPOTIFYSECRET).toString('base64')) },
@@ -116,9 +116,9 @@ router.post('/devices', (req,res) => {
                     },
                     json: true
                 };
-                request.post(authOptions, function(error, response, body) {
+                request.post(authOptions, (error, response, body) => {
                     if (!error && response.statusCode === 200) {
-                        var access_token = body.access_token;
+                        const access_token = body.access_token;
                         logger.success('Request Completed',name)
                         admin.database().ref(`/users/${name}/accessToken`).set(access_token)
                         res.sendStatus(204)

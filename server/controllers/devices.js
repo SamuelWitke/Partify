@@ -28,7 +28,7 @@ module.exports = {
 						}else if(body.error != undefined && body.error.message == 'The access token expired'){
 							refreshToken(refresh_token,name,true)
 							.then( res => logger.info(res))
-							.catch( e=>{ logger.error(e) });
+							.catch( e=>{ logger.error("Error caught devices refreshToken",e) });
 							res.json( {msg : body.error.message});
 							}else{
 								refreshToken(refresh_token,name,true)

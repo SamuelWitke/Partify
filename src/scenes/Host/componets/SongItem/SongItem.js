@@ -1,21 +1,11 @@
 import React, { Component } from 'react'
-import PropTypes from 'prop-types'
-import classes from './SongItem.scss'
-import { ListItem } from 'material-ui/List'
 import Checkbox from 'material-ui/Checkbox'
-import Delete from 'material-ui/svg-icons/action/delete'
-import { isObject } from 'lodash'
 import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card';
 import IconButton from 'material-ui/IconButton';
-import StarBorder from 'material-ui/svg-icons/toggle/star-border';
-import ActionFavorite from 'material-ui/svg-icons/action/favorite';
-import ActionFavoriteBorder from 'material-ui/svg-icons/action/favorite-border';
 import Badge from 'material-ui/Badge';
 import DeleteIcon from 'material-ui/svg-icons/action/delete'
-import NotificationsIcon from 'material-ui/svg-icons/social/notifications';
 import ThumbUp from 'material-ui/svg-icons/action/thumb-up';
 import ThumbDown from 'material-ui/svg-icons/action/thumb-down';
-import FlatButton from 'material-ui/FlatButton';
 
 class SongItem extends Component { 
 	constructor (props){
@@ -56,9 +46,9 @@ class SongItem extends Component {
 						<div style={{
 							display: 'flex',
 							flexDirection: 'row',
+							alignContent: "flex-start"
 						}}>
 							<Checkbox 
-								style={{width: 50}}
 								iconStyle={{width: 30, height: 30}}
 								checkedIcon={<ThumbUp />}
 								uncheckedIcon={<ThumbUp />}
@@ -66,7 +56,6 @@ class SongItem extends Component {
 								checked={disabledUp || active}
 								onCheck={() => upVote(song, song._key || id)}/>
 							<Checkbox 
-								style={{width: 50}}
 								iconStyle={{width: 30, height: 30}}
 								checkedIcon={<ThumbDown />}
 								uncheckedIcon={<ThumbDown />}
@@ -75,12 +64,10 @@ class SongItem extends Component {
 								onCheck={() => downVote(song, song._key || id)}/>
 							{ visableDelete && 
 							<IconButton 
-								style={{width: 0,height: 0,padding: 0}}
 								onClick={() => onDeleteClick(song, song._key || id)}
 								iconStyle={{width: 30, height: 30}}
 							>
 								<DeleteIcon 
-									style={{width: 0}}
 								/>
 							</IconButton>
 							}

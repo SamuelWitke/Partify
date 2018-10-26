@@ -29,16 +29,14 @@ module.exports = {
 					if (!msg.error) {
 						res.json(msg);
 					} else {
-						logger.error(msg.error.message)
+						logger.error("Error in playlist/user-playlist",msg.error.message)
 						refreshToken(refresh_token,name,false)
 							.then( res => logger.info(res))
-							.catch( e=>{ logger.error(e) });
 						res.json({msg :msg.error.message})
 					}
 				}catch (e){
 					refreshToken(refresh_token,name,false)
 						.then( res => logger.info(res))
-						.catch( e=>{ logger.error(e) });
 					res.json({msg :e.msg})
 				}
 			})
