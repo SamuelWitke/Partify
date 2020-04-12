@@ -1,3 +1,7 @@
+# This project is archived but feel free to check out a simmilar project 
+https://festify.rocks/
+https://github.com/Festify/app
+
 <p align="center"><img src="https://s9.postimg.cc/r7lzfx8hr/LOGO_PROPOSAL_FOR_PARTIFY.jpg"></p>
 
 Partify is a free open source Spotify-powered app that lets your guests choose which music should be played using their smartphones.
